@@ -500,13 +500,10 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 	 * Store the attachment/contact pictures
 	 */
 	storeImages : function (store, action, result, res, records) {
-	
-		var attachStores = new Array();
 		
 		Ext.each(records, function(record) {
-			var attachstore = record.createAttachmentStore();
+			record.createAttachmentStore();
 			record.save();
-			attachStores[attachstore.getId()] = attachstore;
 			
 			var responseHandler = new Zarafa.plugins.contactimporter.data.ResponseHandler({
 				successCallback: function (response) {
@@ -532,8 +529,8 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 				'contactmodule',
 				'addattachment',
 				{
-					storeid: attachstore.getId(),
-					entryid: record.id,
+					storeid: record.get("store_entryid"),
+					entryid: record.get("entryid"),
 					tmpfile: record.get("x_photo_path")
 				},
 				responseHandler

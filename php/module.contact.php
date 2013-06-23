@@ -22,6 +22,7 @@
  */
  
 include_once('vcf/class.vCard.php');
+require_once('mapi/mapitags.php' );
  
 class ContactModule extends Module {
 
@@ -136,32 +137,97 @@ class ContactModule extends Module {
 	 * @param $actionData
 	 */
 	private function addAttachment($actionType, $actionData) {
-		// Get Attachment data from state
-		$attachment_state = new AttachmentState();
-		$attachment_state->open();
+	
 		
-		$filename = "ContactPicture.jpg";
-		$tmppath = $actionData["tmpfile"];
-		$filesize = filesize($tmppath);
-		$f = getimagesize($tmppath);
-		$filetype = $f["mime"];
 		
-		// Move the uploaded file into the attachment state
-		$attachid = $attachment_state->addProvidedAttachmentFile($actionData["storeid"], $filename, $tmppath, array(
-			"name"       => $filename,
-			"size"       => $filesize,
-			"type"       => $filetype,
-			"sourcetype" => 'default'
-		));
+		// Get store id
+		$storeid = false;
+		if(isset($actionData["storeid"])) {
+			$storeid = $actionData["storeid"];
+		}
+
+		// Get message entryid
+		$entryid = false;
+		if(isset($actionData["entryid"])) {
+			$entryid = $actionData["entryid"];
+		}
 		
-		$attachment_state->close();
+		$tmpimage = $actionData["tmpfile"];
+		$contactPicture = file_get_contents ($tmpimage);
+		
+		error_log($tmpdata);
+		
+		
+		error_log("opening store");
+		$store = $GLOBALS["mapisession"]->openMessageStore(hex2bin($storeid));
+
+		error_log("opening message");
+		// Open a message from the store
+		try {
+			$message = mapi_msgstore_openentry($store, hex2bin($entryid));
+		} catch (MAPIException $e) {
+			$e->setHandled();
+			error_log($e->getCode());
+			error_log(mapi_last_hresult());
+ 		}
+		
+		error_log("opening attachment");
+		// Open attachment number 0
+		$attach = mapi_message_createattach($message);
+		
+		// Set properties of the attachment		
+		$properties = array(
+			//PR_ATTACH_SIZE => strlen($contactPicture),
+			PR_ATTACH_LONG_FILENAME => 'ContactPicture.jpg',
+			PR_ATTACHMENT_HIDDEN => false,
+			PR_DISPLAY_NAME => 'ContactPicture.jpg',
+			PR_ATTACH_METHOD => ATTACH_BY_VALUE,
+			PR_ATTACH_MIME_TAG => 'image/jpeg',
+			PR_ATTACHMENT_CONTACTPHOTO =>  true,
+			PR_ATTACH_DATA_BIN => "",
+			PR_ATTACHMENT_FLAGS => 1,
+			PR_ATTACH_EXTENSION_A => '.jpg',
+			PR_ATTACH_NUM => 1
+		);
+
+		error_log("setting props");
+		mapi_setprops($attach, $properties);
+		
+		// Stream the file to the PR_ATTACH_DATA_BIN property 
+		error_log("streaming file");
+		$stream = mapi_openproperty($attach, PR_ATTACH_DATA_BIN, IID_IStream, 0, MAPI_CREATE | MAPI_MODIFY);
+		$handle = fopen($tmpimage, "r");
+		while (!feof($handle)) {
+			$contents = fread($handle, BLOCK_SIZE);
+			mapi_stream_write($stream, $contents);
+		}
+		
+		// Commit the stream and save changes
+		mapi_stream_commit($stream);
+		
+		error_log("saving attachment");
+		mapi_savechanges($attach);
+		
+		if (mapi_last_hresult() > 0) {
+			error_log("Error saving attach to contact: " . get_mapi_error_name());
+		}
+		
+		error_log("saving message");
+		mapi_savechanges($message);
+		
+		if (mapi_last_hresult() > 0) {
+			error_log("Error saving contact: " . get_mapi_error_name());
+		}
+		
+		// Open attachment number 0
+		error_log("final tests attachment");
+		$testattach = mapi_message_openattach ($message, 0);
+		error_log(print_r(mapi_attach_getprops($testattach),true));
+
 		
 		$response['status'] = true;
-		$response['storeid'] = $actionData["storeid"];
-		$response['tmpname'] = $attachid;
-		$response['name'] = $filename;
-		$response['size'] = $filesize;
-		$response['type'] = $filetype;
+		$response['storeid'] = $storeid;
+		$response['entryid'] = $entryid;
 		
 		$this->addActionData($actionType, $response);
 		$GLOBALS["bus"]->addData($this->getResponseData());
