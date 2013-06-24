@@ -1,8 +1,8 @@
 <?php
 	/** Disable the import plugin for all clients */
-	define('PLUGIN_CONTACTIMPORTER_USER_DEFAULT_ENABLE', true);
+	define('PLUGIN_CONTACTIMPORTER_USER_DEFAULT_ENABLE', false);
 	/** Disable the export feature for all clients */
-	define('PLUGIN_CONTACTIMPORTER_USER_DEFAULT_ENABLE_EXPORT', false);
+	define('PLUGIN_CONTACTIMPORTER_USER_DEFAULT_ENABLE_EXPORT', false); // currently not available
 	
 	/** The default addressbook to import to (default: contact)*/
 	define('PLUGIN_CONTACTIMPORTER_DEFAULT', "contact");

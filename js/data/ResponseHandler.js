@@ -39,20 +39,12 @@ Zarafa.plugins.contactimporter.data.ResponseHandler = Ext.extend(Zarafa.core.dat
 	 * will be called after success request.
 	 */
 	successCallback : null,
-	
+		
 	/**
 	 * Call the successCallback callback function.
 	 * @param {Object} response Object contained the response data.
 	 */
-	doExport : function(response) {
-		this.successCallback(response);
-	},
-	
-	/**
-	 * Call the successCallback callback function.
-	 * @param {Object} response Object contained the response data.
-	 */
-	doList : function(response) {
+	doLoad : function(response) {
 		this.successCallback(response);
 	},
 	
@@ -63,23 +55,7 @@ Zarafa.plugins.contactimporter.data.ResponseHandler = Ext.extend(Zarafa.core.dat
 	doImport : function(response) {
 		this.successCallback(response);
 	},
-	
-	/**
-	 * Call the successCallback callback function.
-	 * @param {Object} response Object contained the response data.
-	 */
-	doAttachmentpath : function(response) {
-		this.successCallback(response);
-	},
-	
-	/**
-	 * Call the successCallback callback function.
-	 * @param {Object} response Object contained the response data.
-	 */
-	doAddattachment : function(response) {
-		this.successCallback(response);
-	},
-	
+		
 	/**
 	 * In case exception happened on server, server will return
 	 * exception response with the code of exception.

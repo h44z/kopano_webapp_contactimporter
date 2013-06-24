@@ -36,22 +36,8 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 	/* path to vcf file on server... */
 	vcffile: null,
 	
-	/* export contacts buffer */
-	exportResponse: new Array(),
-	
-	/* how many requests are still running? */
-	runningRequests: null,
-	
 	/* The store for the selection grid */
 	store: null,
-	
-	/**
-	 * The internal 'iframe' which is hidden from the user, which is used for downloading
-	 * attachments. See {@link #doOpen}.
-	 * @property
-	 * @type Ext.Element
-	 */
-	downloadFrame : undefined,
 
 	/**
 	 * @constructor
@@ -363,7 +349,7 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 		
 		container.getRequest().singleRequest(
 			'contactmodule',
-			'import',
+			'load',
 			{
 				vcf_filepath: vcfPath
 			},
@@ -469,73 +455,50 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 
 				if(addressbookexist) {
 					this.loadMask.show();
-					var imageRecords = new Array();
+					var uids = new Array();
+					var store_entryid = "";
 					
 					//receive Records from grid rows
 					Ext.each(contacts, function(newRecord) {
-						var tmprec = newRecord.data.record;
-						tmprec['parent_entryid'] = contactFolder.get('entryid');
-						tmprec['store_entryid'] = contactFolder.get('store_entryid');
-						
-						var record = Zarafa.core.data.RecordFactory.createRecordObjectByMessageClass('IPM.Contact', tmprec);
-						contactStore.add(record);
-						
-						if(tmprec.x_photo_path) { // add the contact picture
-							imageRecords.push(record);
-						}
-						
+						uids.push(newRecord.data.record.internal_fields.contact_uid);						
 					}, this);
-					contactStore.on('write', this.storeImages, this); 
-					contactStore.save();
-					this.loadMask.hide();
-					this.dialog.close();
-					//contactStore.un('write', this.storeImages, this); 
-					container.getNotifier().notify('info', 'Imported', 'Imported ' + contacts.length + ' contacts. Please reload your addressbook!');
+					store_entryid = contactFolder.get('store_entryid');
+					
+					var responseHandler = new Zarafa.plugins.contactimporter.data.ResponseHandler({
+						successCallback: this.importContactsDone.createDelegate(this)
+					});
+					
+					container.getRequest().singleRequest(
+						'contactmodule',
+						'import',
+						{
+							storeid: contactFolder.get("store_entryid"),
+							folderid: contactFolder.get("entryid"),
+							uids: uids,
+							vcf_filepath: this.vcffile
+						},
+						responseHandler
+					);
+					
 				}
 			}
 		}
 	},
 	
-	/**
-	 * Store the attachment/contact pictures
-	 */
-	storeImages : function (store, action, result, res, records) {
-		
-		Ext.each(records, function(record) {
-			record.createAttachmentStore();
-			record.save();
-			
-			var responseHandler = new Zarafa.plugins.contactimporter.data.ResponseHandler({
-				successCallback: function (response) {
-					console.log(response);
-					/*var attachmentRecord = Zarafa.core.data.RecordFactory.createRecordObjectByObjectType(Zarafa.core.mapi.ObjectType.MAPI_ATTACH, {
-						attachment_contactphoto: true,
-						hidden: true,
-						tmpname: response.tmpname,
-						name: response.name,
-						attach_num: 0,
-						filetype: response.type,
-						size: response.size
-					});
-					
-					attachStores[response.storeid].add(attachmentRecord);
-					attachStores[response.storeid].commitChanges();
-					console.log(attachStores[response.storeid]);
-					console.log(attachmentRecord.getAttachmentUrl());*/
-				}
+	importContactsDone : function (response) {
+		console.log(response);
+		this.loadMask.hide();
+		this.dialog.close();
+		if(response.status == true) {
+			container.getNotifier().notify('info', 'Imported', 'Imported ' + response.count + ' contacts. Please reload your addressbook!');
+		} else {
+			Zarafa.common.dialogs.MessageBox.show({
+				title   : _('Error'),
+				msg     : _('Import failed: ') + response.message,
+				icon    : Zarafa.common.dialogs.MessageBox.ERROR,
+				buttons : Zarafa.common.dialogs.MessageBox.OK
 			});
-			
-			container.getRequest().singleRequest(
-				'contactmodule',
-				'addattachment',
-				{
-					storeid: record.get("store_entryid"),
-					entryid: record.get("entryid"),
-					tmpfile: record.get("x_photo_path")
-				},
-				responseHandler
-			);
-		});
+		}
 	}
 });
 
