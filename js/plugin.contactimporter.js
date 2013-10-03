@@ -31,12 +31,6 @@ Zarafa.plugins.contactimporter.ImportPlugin = Ext.extend(Zarafa.core.Plugin, {		
      */
 	constructor: function (config) {
 		config = config || {};
-		
-		 Ext.applyIf(config, {
-			name : 'contactimporter',
-			displayName : _('Contactimporter Plugin'),
-			about : Zarafa.plugins.contactimporter.ABOUT
-		});
 				
 		Zarafa.plugins.contactimporter.ImportPlugin.superclass.constructor.call(this, config);
 	},
@@ -237,6 +231,14 @@ Zarafa.plugins.contactimporter.ImportPlugin = Ext.extend(Zarafa.core.Plugin, {		
  *############################################################################################################################*/
 Zarafa.onReady(function() {
 	if(container.getSettingsModel().get("zarafa/v1/plugins/contactimporter/enable") === true) {
-		container.registerPlugin(new Zarafa.plugins.contactimporter.ImportPlugin);
+		if(container.getSettingsModel().get("zarafa/v1/plugins/calendarimporter/enable") === true) {
+			container.registerPlugin(new Zarafa.core.PluginMetaData({
+				name : 'contactimporter',
+				displayName : _('Contactimporter Plugin'),
+				about : Zarafa.plugins.contactimporter.ABOUT,
+				allowUserDisable : true,
+				pluginConstructor : Zarafa.plugins.contactimporter.ImportPlugin
+			}));
+		}
 	}
 });

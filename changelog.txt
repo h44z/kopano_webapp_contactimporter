@@ -1,3 +1,6 @@
+v1.0.1: 03.10.2013
+ - compatible with WebApp 1.4
+
 v1.0: 24.6.2013
  - import vcards (1 or more vcards in a file)
  - chooseable destination addressbook
