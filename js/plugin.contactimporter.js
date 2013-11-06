@@ -1,5 +1,5 @@
 /**
- * plugin.contactimporter.js zarafa calender to ics im/exporter
+ * plugin.contactimporter.js zarafa contactimporter
  *
  * Author: Christoph Haas <christoph.h@sprinternet.at>
  * Copyright (C) 2012-2013 Christoph Haas
@@ -165,8 +165,8 @@ Zarafa.plugins.contactimporter.ImportPlugin = Ext.extend(Zarafa.core.Plugin, {		
 		
 		// request attachment preperation
 		container.getRequest().singleRequest(
-			'calendarmodule',
-			'attachmentpath',
+			'contactmodule',
+			'importattachment',
 			{
 				entryid : entryid,
 				store: store,

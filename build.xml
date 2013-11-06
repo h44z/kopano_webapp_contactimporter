@@ -1,6 +1,6 @@
 <project default="all">
 	<!--############# CONFIGURE ALL PROPERTIES FOR THE REPLACER HERE ################-->
-	<property name="plugin_version" value="1.0.4"/>
+	<property name="plugin_version" value="1.0.2"/>
 	<!-- EOC -->
 	
 	<property name="root-folder" value="${basedir}/../"/>

@@ -63,6 +63,9 @@ class ContactModule extends Module {
 						case "import":
 							$result = $this->importContacts($actionType, $actionData);
 							break;
+						case "importattachment":
+							$result = $this->getAttachmentPath($actionType, $actionData);
+							break;
 						default:
 							$this->handleUnknownActionType($actionType);
 					}
@@ -574,10 +577,12 @@ class ContactModule extends Module {
 					}
 				}
 				if ($vCard -> TITLE) {
-					$properties["title"] = $vCard -> TITLE[0];
+					$title = $vCard -> TITLE[0];
+					$properties["title"] = is_array($title) ? $title["Value"] : $title;
 				}
 				if ($vCard -> URL) {
-					$properties["webpage"] = $vCard -> URL[0];
+					$url = $vCard -> URL[0]; // only 1 webaddress
+					$properties["webpage"] = is_array($url) ? $url["Value"] : $url;
 				}
 				if ($vCard -> IMPP) {
 					foreach ($vCard -> IMPP as $IMPP) {
@@ -670,6 +675,145 @@ class ContactModule extends Module {
 		if (isset($street) && $street != "") $out = $street . (($out)?"\r\n". $out: "") ;
 
 		return $out;
+	}
+	
+	/**
+	 * Store the file to a temporary directory
+	 * @param $actionType
+	 * @param $actionData
+	 * @private
+	 */
+	private function getAttachmentPath($actionType, $actionData) {
+		// Get store id
+		$storeid = false;
+		if(isset($actionData["store"])) {
+			$storeid = $actionData["store"];
+		}
+
+		// Get message entryid
+		$entryid = false;
+		if(isset($actionData["entryid"])) {
+			$entryid = $actionData["entryid"];
+		}
+
+		// Check which type isset
+		$openType = "attachment";
+
+		// Get number of attachment which should be opened.
+		$attachNum = false;
+		if(isset($actionData["attachNum"])) {
+			$attachNum = $actionData["attachNum"];
+		}
+
+		// Check if storeid and entryid isset
+		if($storeid && $entryid) {
+			// Open the store
+			$store = $GLOBALS["mapisession"]->openMessageStore(hex2bin($storeid));
+			
+			if($store) {
+				// Open the message
+				$message = mapi_msgstore_openentry($store, hex2bin($entryid));
+				
+				if($message) {
+					$attachment = false;
+
+					// Check if attachNum isset
+					if($attachNum) {
+						// Loop through the attachNums, message in message in message ...
+						for($i = 0; $i < (count($attachNum) - 1); $i++)
+						{
+							// Open the attachment
+							$tempattach = mapi_message_openattach($message, (int) $attachNum[$i]);
+							if($tempattach) {
+								// Open the object in the attachment
+								$message = mapi_attach_openobj($tempattach);
+							}
+						}
+
+						// Open the attachment
+						$attachment = mapi_message_openattach($message, (int) $attachNum[(count($attachNum) - 1)]);
+					}
+
+					// Check if the attachment is opened
+					if($attachment) {
+						
+						// Get the props of the attachment
+						$props = mapi_attach_getprops($attachment, array(PR_ATTACH_LONG_FILENAME, PR_ATTACH_MIME_TAG, PR_DISPLAY_NAME, PR_ATTACH_METHOD));
+						// Content Type
+						$contentType = "application/octet-stream";
+						// Filename
+						$filename = "ERROR";
+
+						// Set filename
+						if(isset($props[PR_ATTACH_LONG_FILENAME])) {
+							$filename = $props[PR_ATTACH_LONG_FILENAME];
+						} else if(isset($props[PR_ATTACH_FILENAME])) {
+							$filename = $props[PR_ATTACH_FILENAME];
+						} else if(isset($props[PR_DISPLAY_NAME])) {
+							$filename = $props[PR_DISPLAY_NAME];
+						} 
+				
+						// Set content type
+						if(isset($props[PR_ATTACH_MIME_TAG])) {
+							$contentType = $props[PR_ATTACH_MIME_TAG];
+						} else {
+							// Parse the extension of the filename to get the content type
+							if(strrpos($filename, ".") !== false) {
+								$extension = strtolower(substr($filename, strrpos($filename, ".")));
+								$contentType = "application/octet-stream";
+								if (is_readable("mimetypes.dat")){
+									$fh = fopen("mimetypes.dat","r");
+									$ext_found = false;
+									while (!feof($fh) && !$ext_found){
+										$line = fgets($fh);
+										preg_match("/(\.[a-z0-9]+)[ \t]+([^ \t\n\r]*)/i", $line, $result);
+										if ($extension == $result[1]){
+											$ext_found = true;
+											$contentType = $result[2];
+										}
+									}
+									fclose($fh);
+								}
+							}
+						}
+						
+						
+						$tmpname = tempnam(TMP_PATH, stripslashes($filename));
+
+						// Open a stream to get the attachment data
+						$stream = mapi_openpropertytostream($attachment, PR_ATTACH_DATA_BIN);
+						$stat = mapi_stream_stat($stream);
+						// File length =  $stat["cb"]
+						
+						$fhandle = fopen($tmpname,'w');
+						$buffer = null;
+						for($i = 0; $i < $stat["cb"]; $i += BLOCK_SIZE) {
+							// Write stream
+							$buffer = mapi_stream_read($stream, BLOCK_SIZE);
+							fwrite($fhandle,$buffer,strlen($buffer));
+						}
+						fclose($fhandle);
+						
+						$response = array();
+						$response['tmpname'] = $tmpname;
+						$response['filename'] = $filename;
+						$response['status'] = true;
+						$this->addActionData($actionType, $response);
+						$GLOBALS["bus"]->addData($this->getResponseData());
+					}
+				}
+			} else {
+				$response['status'] = false;
+				$response['message'] = "Store could not be opened!";
+				$this->addActionData($actionType, $response);
+				$GLOBALS["bus"]->addData($this->getResponseData());
+			}
+		} else {
+			$response['status'] = false;
+			$response['message'] = "Wrong call, store and entryid have to be set!";
+			$this->addActionData($actionType, $response);
+			$GLOBALS["bus"]->addData($this->getResponseData());
+		}
 	}
 };
 
