@@ -1,3 +1,6 @@
+v1.0.3: 01.05.2014
+ - compatible with WebApp 1.5 and WebApp 1.6
+
 v1.0.2: 06.11.2013
  - fixed: importing attachments
  - fixed: plugin not enabled bug
