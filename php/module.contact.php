@@ -65,6 +65,9 @@ class ContactModule extends Module {
 						case "import":
 							$result = $this->importContacts($actionType, $actionData);
 							break;
+						case "export":
+							$result = $this->exportContacts($actionType, $actionData);
+							break;
 						case "importattachment":
 							$result = $this->getAttachmentPath($actionType, $actionData);
 							break;
@@ -240,7 +243,54 @@ class ContactModule extends Module {
 		$this->addActionData($actionType, $response);
 		$GLOBALS["bus"]->addData($this->getResponseData());
 	}
-	
+
+	private function exportContacts($actionType, $actionData)
+	{
+		// Get store id
+		$storeid = false;
+		if (isset($actionData["storeid"])) {
+			$storeid = $actionData["storeid"];
+		}
+
+		// Get records
+		$records = array();
+		if (isset($actionData["records"])) {
+			$records = $actionData["records"];
+		}
+
+		$response = array();
+		$error = false;
+		$error_msg = "";
+
+		// write csv
+		$token = $this->randomstring(16);
+		$file = PLUGIN_CONTACTIMPORTER_TMP_UPLOAD . "vcf_" . $token . ".vcf";
+		file_put_contents($file, "");
+
+		$store = $GLOBALS["mapisession"]->openMessageStore(hex2bin($storeid));
+		if ($store) {
+			for ($index = 0, $count = count($records); $index < $count; $index++) {
+				$message = mapi_msgstore_openentry($store, hex2bin($records[$index]));
+
+				// get message properties.
+				$messageProps = mapi_getprops($message, array(PR_DISPLAY_NAME));
+				file_put_contents($file, file_get_contents($file) . $messageProps[PR_DISPLAY_NAME]);
+
+				// TODO: implement vcf
+			}
+		} else {
+			return false;
+		}
+
+		$response['status'] = true;
+		$response['download_token'] = $token;
+		$response['filename'] = "test.csv";
+
+		$this->addActionData($actionType, $response);
+		$GLOBALS["bus"]->addData($this->getResponseData());
+	}
+
+
 	private function replaceStringPropertyTags($store, $properties) {
 		$newProperties = array();
 

@@ -55,6 +55,14 @@ Zarafa.plugins.contactimporter.data.ResponseHandler = Ext.extend(Zarafa.core.dat
 	doImport : function(response) {
 		this.successCallback(response);
 	},
+
+	/**
+	 * Call the successCallback callback function.
+	 * @param {Object} response Object contained the response data.
+	 */
+	doExport : function(response) {
+		this.successCallback(response);
+	},
 	
 	/**
 	 * Call the successCallback callback function.

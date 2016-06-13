@@ -20,7 +20,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
- 
+require_once __DIR__ . "/download.php";
+
 /**
  * contactimporter Plugin
  *
@@ -40,6 +41,7 @@ class Plugincontactimporter extends Plugin {
 	 */
 	function init() {
 		$this->registerHook('server.core.settings.init.before');
+		$this->registerHook('server.index.load.custom');
 	}
 
 	/**
@@ -53,6 +55,11 @@ class Plugincontactimporter extends Plugin {
 		switch($eventID) {
 			case 'server.core.settings.init.before' :
 				$this->injectPluginSettings($data);
+				break;
+			case 'server.index.load.custom':
+				if ($data['name'] == 'download_vcf') {
+					DownloadHandler::doDownload();
+				}
 				break;
 		}
 	}

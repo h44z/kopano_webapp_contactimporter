@@ -50,6 +50,9 @@ Zarafa.plugins.contactimporter.ImportPlugin = Ext.extend(Zarafa.core.Plugin, {		
 
 		/* add import button to south navigation */
 		this.registerInsertionPoint("navigation.south", this.createImportButton, this);
+
+		/* export a contact via rightclick */
+		this.registerInsertionPoint('context.contact.contextmenu.actions', this.createItemExportInsertionPoint, this);
 	},
 	
     /**
@@ -73,6 +76,66 @@ Zarafa.plugins.contactimporter.ImportPlugin = Ext.extend(Zarafa.core.Plugin, {		
 		}
 		
 		return  button;
+	},
+
+	/**
+	 * This method hooks to the contact context menu and allows users to export users to vcf.
+	 *
+	 * @param include
+	 * @param btn
+	 * @returns {Object}
+	 */
+	createItemExportInsertionPoint: function (include, btn) {
+		return {
+			text   : dgettext('plugin_files', 'Export VCF'),
+			handler: this.exportToVCF.createDelegate(this, [btn]),
+			scope  : this,
+			iconCls: 'icon_contactimporter_export'
+		};
+	},
+
+	exportToVCF: function(btn) {
+		if(btn.records.length == 0) {
+			return; // skip if no records where given!
+		}
+
+		var recordIds = [];
+
+		for(var i=0;i<btn.records.length;i++) {
+			recordIds.push(btn.records[i].get("entryid"));
+		}
+
+		var responseHandler = new Zarafa.plugins.contactimporter.data.ResponseHandler({
+			successCallback: this.downloadVCF,
+			scope: this
+		});
+
+		// request attachment preperation
+		container.getRequest().singleRequest(
+			'contactmodule',
+			'export',
+			{
+				storeid : btn.records[0].get("store_entryid"),
+				records: recordIds
+			},
+			responseHandler
+		);
+	},
+
+	downloadVCF: function(response) {
+		var downloadFrame = Ext.getBody().createChild({
+			tag: 'iframe',
+			cls: 'x-hidden'
+		});
+
+		var url = document.URL;
+		var link = url.substring(0, url.lastIndexOf('/') + 1);
+
+		link += "index.php?sessionid=" + container.getUser().getSessionId() + "&load=custom&name=download_vcf";
+		link = Ext.urlAppend(link, "token=" + encodeURIComponent(response.download_token));
+		link = Ext.urlAppend(link, "filename=" + encodeURIComponent(response.filename));
+
+		downloadFrame.dom.contentWindow.location = link;
 	},
 	
 	/**
