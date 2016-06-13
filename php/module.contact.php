@@ -753,35 +753,55 @@ class ContactModule extends Module {
 				}
 				if (isset($vCard->email) && count($vCard->email) > 0) {
 					$emailcount = 0;
+					$properties["address_book_long"] = 0;
 					foreach ($vCard->email as $type => $email) {
-						$email = $email[0]; // we only can store one mail address
-						$fileas = $email;
-						if(isset($properties["fileas"]) && !empty($properties["fileas"])) {
-							$fileas = $properties["fileas"]; // set to real name
-						}
+						foreach ($email as $mail) {
+							$fileas = $mail;
+							if (isset($properties["fileas"]) && !empty($properties["fileas"])) {
+								$fileas = $properties["fileas"]; // set to real name
+							}
 
-						// we only have storage for 3 mail addresses!
-						switch($emailcount) {
-							case 0:
-								$properties["email_address_1"] = $email;
-								$properties["email_address_display_name_1"] = $fileas . " (" . $email . ")";
-								$properties["email_address_display_name_email_1"] = $email;
-								$properties["address_book_mv"] = [0]; // this is needed for adding the contact to the email address book, 0 = email 1
-								$properties["address_book_long"] = 1; // this specifies the number of elements in address_book_mv
-								break;
-							case 1:
-								$properties["email_address_2"] = $email;
-								$properties["email_address_display_name_2"] = $fileas . " (" . $email . ")";
-								$properties["email_address_display_name_email_2"] = $email;
-								break;
-							case 2:
-								$properties["email_address_3"] = $email;
-								$properties["email_address_display_name_3"] = $fileas . " (" . $email . ")";
-								$properties["email_address_display_name_email_3"] = $email;
-								break;
-							default: break;
+							// we only have storage for 3 mail addresses!
+							/**
+							 * type of email address		address_book_mv			address_book_long
+							 *	email1						0						1 (0x00000001)
+							 *	email2						1						2 (0x00000002)
+							 *	email3						2						4 (0x00000004)
+							 *	fax2(business fax)			3						8 (0x00000008)
+							 *	fax3(home fax)				4						16 (0x00000010)
+							 *	fax1(primary fax)			5						32 (0x00000020)
+							 *
+							 *	address_book_mv is a multivalued property so all the values are passed in array
+							 *	address_book_long stores sum of the flags
+							 *	these both properties should be in sync always
+							 */
+							switch ($emailcount) {
+								case 0:
+									$properties["email_address_1"] = $mail;
+									$properties["email_address_display_name_1"] = $fileas . " (" . $mail . ")";
+									$properties["email_address_display_name_email_1"] = $mail;
+									$properties["address_book_mv"][] = 0; // this is needed for adding the contact to the email address book, 0 = email 1
+									$properties["address_book_long"] += 1; // this specifies the number of elements in address_book_mv
+									break;
+								case 1:
+									$properties["email_address_2"] = $mail;
+									$properties["email_address_display_name_2"] = $fileas . " (" . $mail . ")";
+									$properties["email_address_display_name_email_2"] = $mail;
+									$properties["address_book_mv"][] = 1; // this is needed for adding the contact to the email address book, 1 = email 2
+									$properties["address_book_long"] += 2; // this specifies the number of elements in address_book_mv
+									break;
+								case 2:
+									$properties["email_address_3"] = $mail;
+									$properties["email_address_display_name_3"] = $fileas . " (" . $mail . ")";
+									$properties["email_address_display_name_email_3"] = $mail;
+									$properties["address_book_mv"][] = 2; // this is needed for adding the contact to the email address book, 2 = email 3
+									$properties["address_book_long"] += 4; // this specifies the number of elements in address_book_mv
+									break;
+								default:
+									break;
+							}
+							$emailcount++;
 						}
-						$emailcount++;
 					}
 				}
 				if (isset($vCard->organization)) {
