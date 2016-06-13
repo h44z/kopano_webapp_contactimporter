@@ -132,6 +132,16 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 		};
 	},
 
+	getAllContactFolders: function() {
+		var allFolders = [];
+
+		/**
+		 * TODO:
+		 * container.getHierarchyStore() -> 2 stores: inbux und public
+		 * inbox -> substores -> alle folder!
+		 */
+	},
+
 	/**
 	 * Reloads the data of the grid
 	 * @private
