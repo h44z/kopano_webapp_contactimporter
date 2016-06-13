@@ -47,6 +47,7 @@ Zarafa.plugins.contactimporter.ImportPlugin = Ext.extend(Zarafa.core.Plugin, {		
 		
 		/* directly import received vcfs */
 		this.registerInsertionPoint('common.contextmenu.attachment.actions', this.createAttachmentImportButton);
+
 		/* add import button to south navigation */
 		this.registerInsertionPoint("navigation.south", this.createImportButton, this);
 	},
@@ -60,7 +61,6 @@ Zarafa.plugins.contactimporter.ImportPlugin = Ext.extend(Zarafa.core.Plugin, {		
 	createImportButton: function () {
 		var button = {
 			xtype				: 'button',
-			id		  			: "importcontactsbutton",
 			text				: _('Import Contacts'),
 			iconCls				: 'icon_contactimporter_button',
 			navigationContext	: container.getContextByName('contact'),
@@ -90,9 +90,9 @@ Zarafa.plugins.contactimporter.ImportPlugin = Ext.extend(Zarafa.core.Plugin, {		
 				var extension = record.data.name.split('.').pop().toLowerCase();
 				
 				if(record.data.filetype  == "text/vcard" || extension == "vcf" || extension == "vcard") {
-					item.setDisabled(false);
+					item.setVisible(false);
 				} else {
-					item.setDisabled(true);
+					item.setVisible(true);
 				}
 			}
 		};
@@ -103,10 +103,7 @@ Zarafa.plugins.contactimporter.ImportPlugin = Ext.extend(Zarafa.core.Plugin, {		
 	 */
 	gotAttachmentFileName: function(response) {
 		if(response.status == true) {
-			Zarafa.core.data.UIFactory.openLayerComponent(Zarafa.core.data.SharedComponentType['plugins.contactimporter.dialogs.importcontacts'], undefined, {
-				manager : Ext.WindowMgr,
-				filename : response.tmpname
-			});
+			this.openImportDialog(response.tmpname);
 		} else {
 			Zarafa.common.dialogs.MessageBox.show({
 				title   : _('Error'),
@@ -182,12 +179,23 @@ Zarafa.plugins.contactimporter.ImportPlugin = Ext.extend(Zarafa.core.Plugin, {		
 	 * Clickhandler for the button
 	 */
 	onImportButtonClick: function () {
-		Ext.getCmp("importcontactsbutton").disable();
-		Zarafa.core.data.UIFactory.openLayerComponent(Zarafa.core.data.SharedComponentType['plugins.contactimporter.dialogs.importcontacts'], undefined, {
-			manager : Ext.WindowMgr
-		});
+		this.openImportDialog();
 	},
-		
+
+	/**
+	 * Open the import dialog.
+	 *
+	 * @param {String} filename
+     */
+	openImportDialog: function(filename) {
+		var componentType = Zarafa.core.data.SharedComponentType['plugins.contactimporter.dialogs.importcontacts'];
+		var config = {
+			filename: filename
+		};
+
+		Zarafa.core.data.UIFactory.openLayerComponent(componentType, undefined, config);
+	},
+
 	/**
 	 * Bid for the type of shared component
 	 * and the given record.
@@ -200,7 +208,7 @@ Zarafa.plugins.contactimporter.ImportPlugin = Ext.extend(Zarafa.core.Plugin, {		
 		var bid = -1;
 		switch(type) {
 			case Zarafa.core.data.SharedComponentType['plugins.contactimporter.dialogs.importcontacts']:
-				bid = 2;
+				bid = 1;
 				break;
 		}
 		return bid;

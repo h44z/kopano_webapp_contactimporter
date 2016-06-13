@@ -47,7 +47,7 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 		config = config || {};
 		var self = this;
 		
-		if(typeof config.filename !== "undefined") {
+		if(!Ext.isEmpty(config.filename)) {
 			this.vcffile = config.filename;
 		}
 		
@@ -146,13 +146,13 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 			var i = 0;
 			for(i = 0; i < contactdata.contacts.length; i++) {
 				
-				parsedData[i] = new Array(
+				parsedData[i] = [
 					contactdata.contacts[i]["display_name"],
 					contactdata.contacts[i]["given_name"],
 					contactdata.contacts[i]["surname"],
 					contactdata.contacts[i]["company_name"],
 					contactdata.contacts[i]
-				);
+				];
 			}
 		} else {
 			return null;
@@ -202,10 +202,10 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 		
 		/* add all local contact folders */
 		var i = 0;
-		myStore.push(new Array(defaultFolder.getDefaultFolderKey(), defaultFolder.getDisplayName()));
+		myStore.push([defaultFolder.getDefaultFolderKey(), defaultFolder.getDisplayName()]);
 		for(i = 0; i < subFolders.length; i++) {
 			/* Store all subfolders */
-			myStore.push(new Array(subFolders[i].getDisplayName(), subFolders[i].getDisplayName(), false)); // 3rd field = isPublicfolder
+			myStore.push([subFolders[i].getDisplayName(), subFolders[i].getDisplayName(), false]); // 3rd field = isPublicfolder
 		}
 		
 		/* add all shared contact folders */
@@ -217,7 +217,7 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 				var pubSubFolders = pubFolder.getChildren();
 				for(i = 0; i < pubSubFolders.length; i++) {
 					if(pubSubFolders[i].isContainerClass("IPF.Contact")){
-						myStore.push(new Array(pubSubFolders[i].getDisplayName(), pubSubFolders[i].getDisplayName() + " [Shared]", true)); // 3rd field = isPublicfolder
+						myStore.push([pubSubFolders[i].getDisplayName(), pubSubFolders[i].getDisplayName() + " [Shared]", true]); // 3rd field = isPublicfolder
 					}
 				}
 			} catch (e) {
@@ -455,7 +455,7 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 
 				if(addressbookexist) {
 					this.loadMask.show();
-					var uids = new Array();
+					var uids = [];
 					var store_entryid = "";
 					
 					//receive Records from grid rows

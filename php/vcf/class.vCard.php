@@ -5,9 +5,8 @@
  * @link https://github.com/nuovo/vCard-parser
  * @author Martins Pilsetnieks, Roberts Bruveris
  * @see RFC 2426, RFC 2425
- * @version 0.4.8
-*/
-
+ * @version 0.4.9
+ */
 class vCard implements Countable, Iterator
 {
 	const MODE_ERROR = 'error';
@@ -42,15 +41,15 @@ class vCard implements Countable, Iterator
 	 * @static Parts of structured elements according to the spec.
 	 */
 	private static $Spec_StructuredElements = array(
-		'n' => array('LastName', 'FirstName', 'AdditionalNames', 'Prefixes', 'Suffixes'),
-		'adr' => array('POBox', 'ExtendedAddress', 'StreetAddress', 'Locality', 'Region', 'PostalCode', 'Country'),
-		'geo' => array('Latitude', 'Longitude'),
-		'org' => array('Name', 'Unit1', 'Unit2')
+		'n' => array('lastname', 'firstname', 'additionalnames', 'prefixes', 'suffixes'),
+		'adr' => array('pobox', 'extendedaddress', 'streetaddress', 'locality', 'region', 'postalcode', 'country'),
+		'geo' => array('latitude', 'longitude'),
+		'org' => array('name', 'unit1', 'unit2')
 	);
 	private static $Spec_MultipleValueElements = array('nickname', 'categories');
 
 	private static $Spec_ElementTypes = array(
-		'email' => array('internet', 'x400', 'pref'),
+		'email' => array('internet', 'x400', 'pref', 'home', 'work'),
 		'adr' => array('dom', 'intl', 'postal', 'parcel', 'home', 'work', 'pref'),
 		'label' => array('dom', 'intl', 'postal', 'parcel', 'home', 'work', 'pref'),
 		'tel' => array('home', 'msg', 'work', 'pref', 'voice', 'fax', 'cell', 'video', 'pager', 'bbs', 'modem', 'car', 'isdn', 'pcs'),
@@ -121,21 +120,26 @@ class vCard implements Countable, Iterator
 		$this -> Mode = $vCardBeginCount == 1 ? vCard::MODE_SINGLE : vCard::MODE_MULTIPLE;
 
 		// Removing/changing inappropriate newlines, i.e., all CRs or multiple newlines are changed to a single newline
-		$this -> RawData = str_replace("\r", "\n", $this -> RawData);
-		$this -> RawData = preg_replace('{(\n+)}', "\n", $this -> RawData);
+
+		// MCA: removed, this break crlf vcard specification, all line dilimiter are CRLF
+		//$this -> RawData = str_replace("\r", "\n", $this -> RawData);
+		//$this -> RawData = preg_replace('{(\n)+}', "\n", $this -> RawData);
 
 		// In multiple card mode the raw text is split at card beginning markers and each
 		//	fragment is parsed in a separate vCard object.
 		if ($this -> Mode == self::MODE_MULTIPLE)
 		{
-			$this -> RawData = explode('BEGIN:VCARD', $this -> RawData);
+			//Cannot use "explode", because we need to ignore, for example, 'AGENT:BEGIN:VCARD'
+			$this -> RawData = preg_split('{^BEGIN\:VCARD}miS', $this -> RawData);
 			$this -> RawData = array_filter($this -> RawData);
 
 			foreach ($this -> RawData as $SinglevCardRawData)
 			{
+				// mca: remove \n and \r at start
+				//$SinglevCardRawData=ltrim($SinglevCardRawData);
 				// Prepending "BEGIN:VCARD" to the raw string because we exploded on that one.
 				// If there won't be the BEGIN marker in the new object, it will fail.
-				$SinglevCardRawData = 'BEGIN:VCARD'."\n".$SinglevCardRawData;
+				$SinglevCardRawData = 'BEGIN:VCARD'.$SinglevCardRawData;
 
 				$ClassName = get_class($this);
 				$this -> Data[] = new $ClassName(false, $SinglevCardRawData);
@@ -143,20 +147,20 @@ class vCard implements Countable, Iterator
 		}
 		else
 		{
-			// Protect the BASE64 final = sign (detected by the line beginning with whitespace), otherwise the next replace will get rid of it
-			$this -> RawData = preg_replace('{(\n\s.+)=(\n)}', '$1-base64=-$2', $this -> RawData);
-
 			// Joining multiple lines that are split with a hard wrap and indicated by an equals sign at the end of line
 			// (quoted-printable-encoded values in v2.1 vCards)
-			$this -> RawData = str_replace("=\n", '', $this -> RawData);
+			$this -> RawData = str_replace("=\r\n", '', $this -> RawData);
+
+			// Protect the BASE64 final = sign (detected by the line beginning with whitespace), otherwise the next replace will get rid of it
+			$this -> RawData = preg_replace('{(\r\n\s.+)=(\r\n)}', '$1-base64=-$2', $this -> RawData);
 
 			// Joining multiple lines that are split with a soft wrap (space or tab on the beginning of the next line
-			$this -> RawData = str_replace(array("\n ", "\n\t"), '-wrap-', $this -> RawData);
+			$this -> RawData = str_replace(array("\r\n ", "\r\n\t"), '-wrap-', $this -> RawData);
 
 			// Restoring the BASE64 final equals sign (see a few lines above)
-			$this -> RawData = str_replace("-base64=-\n", "=\n", $this -> RawData);
+			$this -> RawData = str_replace("-base64=-\r\n", "=\r\n", $this -> RawData);
 
-			$Lines = explode("\n", $this -> RawData);
+			$Lines = explode("\r\n", $this -> RawData);
 
 			foreach ($Lines as $Line)
 			{
@@ -212,6 +216,7 @@ class vCard implements Countable, Iterator
 					$ItemIndex = (int)str_ireplace('item', '', $TmpKey[0]);
 				}
 
+
 				if (count($KeyParts) > 1)
 				{
 					$Parameters = self::ParseParameters($Key, array_slice($KeyParts, 1));
@@ -262,7 +267,7 @@ class vCard implements Countable, Iterator
 					$Value = self::ParseStructuredValue($Value, $Key);
 					if ($Type)
 					{
-						$Value['Type'] = $Type;
+						$Value['type'] = $Type;
 					}
 				}
 				else
@@ -275,15 +280,15 @@ class vCard implements Countable, Iterator
 					if ($Type)
 					{
 						$Value = array(
-							'Value' => $Value,
-							'Type' => $Type
+							'value' => $Value,
+							'type' => $Type
 						);
 					}
 				}
 
 				if (is_array($Value) && $Encoding)
 				{
-					$Value['Encoding'] = $Encoding;
+					$Value['encoding'] = $Encoding;
 				}
 
 				if (!isset($this -> Data[$Key]))
@@ -294,6 +299,22 @@ class vCard implements Countable, Iterator
 				$this -> Data[$Key][] = $Value;
 			}
 		}
+	}
+
+	/**
+	 * method to get key list of the current vcard
+	 *
+	 * @return array list of key
+	 */
+	public function getKeyList()
+	{
+		$keylist=array();
+		if (isset($this -> Data))
+		{
+			foreach($this -> Data as $key => $val)
+				$keylist[]=$key;
+		}
+		return $keylist;
 	}
 
 	/**
@@ -318,10 +339,10 @@ class vCard implements Countable, Iterator
 				$Value = $this -> Data[$Key];
 				foreach ($Value as $K => $V)
 				{
-					if (stripos($V['Value'], 'uri:') === 0)
+					if (isset($V['Value']) && stripos($V['Value'], 'uri:') === 0)
 					{
-						$Value[$K]['Value'] = substr($V, 4);
-						$Value[$K]['Encoding'] = 'uri';
+						$Value[$K]['value'] = substr($V, 4);
+						$Value[$K]['encoding'] = 'uri';
 					}
 				}
 				return $Value;
@@ -338,6 +359,20 @@ class vCard implements Countable, Iterator
 			return $this -> Mode;
 		}
 		return array();
+	}
+
+	/**
+	 * Magic method to check isset for the various vCard values as object members, e.g.
+	 *	a call to isset( $vCard -> fn ) checks existence of a value.
+	 *
+	 * @param string Key
+	 *
+	 * @return bool isset
+	 */
+	public function __isset($Key) {
+		$Key = strtolower($Key);
+		$val = $this->$Key;
+		return isset($val);
 	}
 
 	/**
@@ -361,15 +396,15 @@ class vCard implements Countable, Iterator
 		}
 
 		// Returing false if it is an image URL
-		if (stripos($this -> Data[$Key][$Index]['Value'], 'uri:') === 0)
+		if (stripos($this -> Data[$Key][$Index]['value'], 'uri:') === 0)
 		{
 			return false;
 		}
 
 		if (is_writable($TargetPath) || (!file_exists($TargetPath) && is_writable(dirname($TargetPath))))
 		{
-			$RawContent = $this -> Data[$Key][$Index]['Value'];
-			if (isset($this -> Data[$Key][$Index]['Encoding']) && $this -> Data[$Key][$Index]['Encoding'] == 'b')
+			$RawContent = $this -> Data[$Key][$Index]['value'];
+			if (isset($this -> Data[$Key][$Index]['encoding']) && $this -> Data[$Key][$Index]['encoding'] == 'b')
 			{
 				$RawContent = base64_decode($RawContent);
 			}
@@ -404,10 +439,10 @@ class vCard implements Countable, Iterator
 
 		if (count($Arguments) > 1)
 		{
-			$Types = array_values(array_slice($Arguments, 1));
+			$Types = array_map('strtolower', array_values(array_slice($Arguments, 1)));
 
 			if (isset(self::$Spec_StructuredElements[$Key]) &&
-				in_array($Arguments[1], self::$Spec_StructuredElements[$Key])
+				in_array(strtolower($Arguments[1]), self::$Spec_StructuredElements[$Key])
 			)
 			{
 				$LastElementIndex = 0;
@@ -439,8 +474,8 @@ class vCard implements Countable, Iterator
 			elseif (isset(self::$Spec_ElementTypes[$Key]))
 			{
 				$this -> Data[$Key][] = array(
-					'Value' => $Value,
-					'Type' => $Types
+					'value' => $Value,
+					'type' => $Types
 				);
 			}
 		}
@@ -475,9 +510,9 @@ class vCard implements Countable, Iterator
 			foreach ($Values as $Index => $Value)
 			{
 				$Text .= $KeyUC;
-				if (is_array($Value) && isset($Value['Type']))
+				if (is_array($Value) && isset($Value['type']))
 				{
-					$Text .= ';TYPE='.self::PrepareTypeStrForOutput($Value['Type']);
+					$Text .= ';TYPE='.self::PrepareTypeStrForOutput($Value['type']);
 				}
 				$Text .= ':';
 
@@ -492,7 +527,7 @@ class vCard implements Countable, Iterator
 				}
 				elseif (is_array($Value) && isset(self::$Spec_ElementTypes[$Key]))
 				{
-					$Text .= $Value['Value'];
+					$Text .= $Value['value'];
 				}
 				else
 				{
@@ -574,7 +609,8 @@ class vCard implements Countable, Iterator
 		$Parameters = array();
 		foreach ($RawParams as $Item)
 		{
-			$Parameters[] = explode('=', strtolower($Item));
+			// try to correct issue https://github.com/nuovo/vCard-parser/issues/20
+			$Parameters[] = explode('=', strtolower($Item),2);
 		}
 
 		$Type = array();
@@ -604,10 +640,13 @@ class vCard implements Countable, Iterator
 			}
 			elseif (count($Parameter) > 2)
 			{
-				$TempTypeParams = self::ParseParameters($Key, explode(',', $RawParams[$Index]));
-				if ($TempTypeParams['type'])
+				if(count(explode(',', $RawParams[$Index], -1)) > 0)
 				{
-					$Type = array_merge($Type, $TempTypeParams['type']);
+					$TempTypeParams = self::ParseParameters($Key, explode(',', $RawParams[$Index]));
+					if ($TempTypeParams['type'])
+					{
+						$Type = array_merge($Type, $TempTypeParams['type']);
+					}
 				}
 			}
 			else
