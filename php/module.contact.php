@@ -309,6 +309,7 @@ class ContactModule extends Module {
 		$properties = array();
 
 		$properties["subject"] = PR_SUBJECT;
+		$properties["hide_attachments"] = "PT_BOOLEAN:PSETID_Common:0x851";
 		$properties["icon_index"] = PR_ICON_INDEX;
 		$properties["message_class"] = PR_MESSAGE_CLASS;
 		$properties["display_name"] = PR_DISPLAY_NAME;
@@ -505,6 +506,8 @@ class ContactModule extends Module {
 					error_log("Skipping entry! No fullname/organization given.");
 					continue;
 				}
+
+				$properties["hide_attachments"] = true;
 				
 				//uid - used for front/backend communication
 				$properties["internal_fields"] = array();
@@ -551,16 +554,19 @@ class ContactModule extends Module {
 							case 0:
 								$properties["email_address_1"] = $email;
 								$properties["email_address_display_name_1"] = $fileas . " (" . $email . ")";
+								$properties["email_address_display_name_email_1"] = $email;
 								$properties["address_book_mv"] = [0]; // this is needed for adding the contact to the email address book, 0 = email 1
 								$properties["address_book_long"] = 1; // this specifies the number of elements in address_book_mv
 								break;
 							case 1:
 								$properties["email_address_2"] = $email;
 								$properties["email_address_display_name_2"] = $fileas . " (" . $email . ")";
+								$properties["email_address_display_name_email_2"] = $email;
 								break;
 							case 2:
 								$properties["email_address_3"] = $email;
 								$properties["email_address_display_name_3"] = $fileas . " (" . $email . ")";
+								$properties["email_address_display_name_email_3"] = $email;
 								break;
 							default: break;
 						}
@@ -682,9 +688,9 @@ class ContactModule extends Module {
 		if (isset($zip) && $zip != "") $zcs = $zip;
 		if (isset($city) && $city != "") $zcs .= (($zcs)?" ":"") . $city;
 		if (isset($state) && $state != "") $zcs .= (($zcs)?" ":"") . $state;
-		if ($zcs) $out = $zcs . "\r\n" . $out;
+		if ($zcs) $out = $zcs . "\n" . $out;
 
-		if (isset($street) && $street != "") $out = $street . (($out)?"\r\n". $out: "") ;
+		if (isset($street) && $street != "") $out = $street . (($out)?"\n\n". $out: "") ;
 
 		return $out;
 	}
