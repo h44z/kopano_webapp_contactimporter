@@ -3,7 +3,7 @@
  * plugin.contactimporter.php, zarafa contact to vcf im/exporter
  *
  * Author: Christoph Haas <christoph.h@sprinternet.at>
- * Copyright (C) 2012-2013 Christoph Haas
+ * Copyright (C) 2012-2016 Christoph Haas
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,18 +28,22 @@ require_once __DIR__ . "/download.php";
  * With this plugin you can import a vcf file to your zarafa addressbook
  *
  */
-class Plugincontactimporter extends Plugin {
+class Plugincontactimporter extends Plugin
+{
 	/**
 	 * Constructor
 	 */
-	function Plugincontactimporter() {}
+	function Plugincontactimporter()
+	{
+	}
 
 	/**
 	 * Function initializes the Plugin and registers all hooks
 	 *
 	 * @return void
 	 */
-	function init() {
+	function init()
+	{
 		$this->registerHook('server.core.settings.init.before');
 		$this->registerHook('server.index.load.custom');
 	}
@@ -51,8 +55,9 @@ class Plugincontactimporter extends Plugin {
 	 * @param mixed $data object(s) related to the hook
 	 * @return void
 	 */
-	function execute($eventID, &$data) {
-		switch($eventID) {
+	function execute($eventID, &$data)
+	{
+		switch ($eventID) {
 			case 'server.core.settings.init.before' :
 				$this->injectPluginSettings($data);
 				break;
@@ -69,15 +74,15 @@ class Plugincontactimporter extends Plugin {
 	 * settings.
 	 * @param Array $data Reference to the data of the triggered hook
 	 */
-	function injectPluginSettings(&$data) {
+	function injectPluginSettings(&$data)
+	{
 		$data['settingsObj']->addSysAdminDefaults(Array(
 			'zarafa' => Array(
 				'v1' => Array(
 					'plugins' => Array(
 						'contactimporter' => Array(
-							'enable'        => PLUGIN_CONTACTIMPORTER_USER_DEFAULT_ENABLE,
-							'enable_export' => PLUGIN_CONTACTIMPORTER_USER_DEFAULT_ENABLE_EXPORT,
-							'default_addressbook'	=> PLUGIN_CONTACTIMPORTER_DEFAULT
+							'enable' => PLUGIN_CONTACTIMPORTER_USER_DEFAULT_ENABLE,
+							'default_addressbook' => PLUGIN_CONTACTIMPORTER_DEFAULT
 						)
 					)
 				)
@@ -85,4 +90,5 @@ class Plugincontactimporter extends Plugin {
 		));
 	}
 }
+
 ?>

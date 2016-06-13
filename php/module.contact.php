@@ -1,9 +1,9 @@
-<?php	
+<?php
 /**
  * class.calendar.php, zarafa contact to vcf im/exporter
  *
  * Author: Christoph Haas <christoph.h@sprinternet.at>
- * Copyright (C) 2012-2013 Christoph Haas
+ * Copyright (C) 2012-2016 Christoph Haas
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,23 +20,25 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
- 
+
 include_once('vendor/autoload.php');
 
 use JeroenDesloovere\VCard\VCard;
 use JeroenDesloovere\VCard\VCardParser;
 
-class ContactModule extends Module {
+class ContactModule extends Module
+{
 
-	private $DEBUG = true; 	// enable error_log debugging
+	private $DEBUG = true;    // enable error_log debugging
 
 	/**
 	 * @constructor
 	 * @param $id
 	 * @param $data
 	 */
-	public function __construct($id, $data) {
-			parent::Module($id, $data);	
+	public function __construct($id, $data)
+	{
+		parent::Module($id, $data);
 	}
 
 	/**
@@ -44,22 +46,23 @@ class ContactModule extends Module {
 	 * Exception part is used for authentication errors also
 	 * @return boolean true on success or false on failure.
 	 */
-	public function execute() {
+	public function execute()
+	{
 		$result = false;
-		
-		if(!$this->DEBUG) {
+
+		if (!$this->DEBUG) {
 			/* disable error printing - otherwise json communication might break... */
 			ini_set('display_errors', '0');
 		}
-		
-		foreach($this->data as $actionType => $actionData) {
-			if(isset($actionType)) {
+
+		foreach ($this->data as $actionType => $actionData) {
+			if (isset($actionType)) {
 				try {
-					if($this->DEBUG) {
+					if ($this->DEBUG) {
 						error_log("exec: " . $actionType);
 					}
-					switch($actionType) {
-						case "load":							
+					switch ($actionType) {
+						case "load":
 							$result = $this->loadContacts($actionType, $actionData);
 							break;
 						case "import":
@@ -76,30 +79,31 @@ class ContactModule extends Module {
 					}
 
 				} catch (MAPIException $e) {
-					if($this->DEBUG) {
+					if ($this->DEBUG) {
 						error_log("mapi exception: " . $e->getMessage());
 					}
 				} catch (Exception $e) {
-					if($this->DEBUG) {
+					if ($this->DEBUG) {
 						error_log("exception: " . $e->getMessage());
 					}
 				}
 			}
 		}
-		
+
 		return $result;
 	}
-	
+
 	/**
 	 * Generates a random string with variable length.
 	 * @param $length the lenght of the generated string
 	 * @return string a random string
 	 */
-	private function randomstring($length = 6) {
+	private function randomstring($length = 6)
+	{
 		// $chars - all allowed charakters
 		$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 
-		srand((double)microtime()*1000000);
+		srand((double)microtime() * 1000000);
 		$i = 0;
 		$pass = "";
 		while ($i < $length) {
@@ -110,42 +114,43 @@ class ContactModule extends Module {
 		}
 		return $pass;
 	}
-	
+
 	/**
 	 * Add an attachment to the give contact
 	 * @param $actionType
 	 * @param $actionData
 	 */
-	private function importContacts($actionType, $actionData) {
-	
+	private function importContacts($actionType, $actionData)
+	{
+
 		// Get uploaded vcf path
 		$vcffile = false;
-		if(isset($actionData["vcf_filepath"])) {
+		if (isset($actionData["vcf_filepath"])) {
 			$vcffile = $actionData["vcf_filepath"];
 		}
-	
+
 		// Get store id
 		$storeid = false;
-		if(isset($actionData["storeid"])) {
+		if (isset($actionData["storeid"])) {
 			$storeid = $actionData["storeid"];
 		}
-		
+
 		// Get folder entryid
 		$folderid = false;
-		if(isset($actionData["folderid"])) {
+		if (isset($actionData["folderid"])) {
 			$folderid = $actionData["folderid"];
 		}
-		
+
 		// Get uids
 		$uids = array();
-		if(isset($actionData["uids"])) {
+		if (isset($actionData["uids"])) {
 			$uids = $actionData["uids"];
 		}
-		
+
 		$response = array();
 		$error = false;
 		$error_msg = "";
-		
+
 		// parse the vcf file a last time...
 		$parser = null;
 		try {
@@ -154,47 +159,47 @@ class ContactModule extends Module {
 			$error = true;
 			$error_msg = $e->getMessage();
 		}
-		
+
 		$contacts = array();
-		
-		if(!$error && iterator_count($parser) > 0) {
+
+		if (!$error && iterator_count($parser) > 0) {
 			$contacts = $this->parseContactsToArray($parser);
 			$store = $GLOBALS["mapisession"]->openMessageStore(hex2bin($storeid));
 			$folder = mapi_msgstore_openentry($store, hex2bin($folderid));
-			
+
 			$importall = false;
-			if(count($uids) == count($contacts)) {
+			if (count($uids) == count($contacts)) {
 				$importall = true;
 			}
-			
+
 			$propValuesMAPI = array();
 			$properties = $this->getProperties();
 			$properties = $this->replaceStringPropertyTags($store, $properties);
 			$count = 0;
-			
+
 			// iterate through all contacts and import them :)
-			foreach($contacts as $contact) {
+			foreach ($contacts as $contact) {
 				if (isset($contact["display_name"]) && ($importall || in_array($contact["internal_fields"]["contact_uid"], $uids))) {
 					// parse the arraykeys
 					// TODO: this is very slow... 
-					foreach($contact as $key => $value) {
-						if($key !== "internal_fields") {
+					foreach ($contact as $key => $value) {
+						if ($key !== "internal_fields") {
 							$propValuesMAPI[$properties[$key]] = $value;
 						}
 					}
-			
+
 					$propValuesMAPI[$properties["message_class"]] = "IPM.Contact";
 					$propValuesMAPI[$properties["icon_index"]] = "512";
 					$message = mapi_folder_createmessage($folder);
-					
-					
-					if(isset($contact["internal_fields"]["x_photo_path"])) {
+
+
+					if (isset($contact["internal_fields"]["x_photo_path"])) {
 						$propValuesMAPI[$properties["picture"]] = 1; // contact has an image
 
 						// import the photo
 						$contactPicture = file_get_contents($contact["internal_fields"]["x_photo_path"]);
 						$attach = mapi_message_createattach($message);
-		
+
 						// Set properties of the attachment
 						$propValuesIMG = array(
 							PR_ATTACH_SIZE => strlen($contactPicture),
@@ -203,27 +208,27 @@ class ContactModule extends Module {
 							PR_DISPLAY_NAME => 'ContactPicture.jpg',
 							PR_ATTACH_METHOD => ATTACH_BY_VALUE,
 							PR_ATTACH_MIME_TAG => 'image/jpeg',
-							PR_ATTACHMENT_CONTACTPHOTO =>  true,
+							PR_ATTACHMENT_CONTACTPHOTO => true,
 							PR_ATTACH_DATA_BIN => $contactPicture,
 							PR_ATTACHMENT_FLAGS => 1,
 							PR_ATTACH_EXTENSION_A => '.jpg',
 							PR_ATTACH_NUM => 1
 						);
-						
+
 						mapi_setprops($attach, $propValuesIMG);
 						mapi_savechanges($attach);
-						if($this->DEBUG) {
+						if ($this->DEBUG) {
 							error_log("Contactpicture imported!");
 						}
-						
+
 						if (mapi_last_hresult() > 0) {
 							error_log("Error saving attach to contact: " . get_mapi_error_name());
 						}
 					}
-					
+
 					mapi_setprops($message, $propValuesMAPI);
 					mapi_savechanges($message);
-					if($this->DEBUG) {
+					if ($this->DEBUG) {
 						error_log("New contact added: \"" . $propValuesMAPI[$properties["display_name"]] . "\".\n");
 					}
 					$count++;
@@ -233,20 +238,21 @@ class ContactModule extends Module {
 			$response['status'] = true;
 			$response['count'] = $count;
 			$response['message'] = "";
-			
+
 		} else {
 			$response['status'] = false;
 			$response['count'] = 0;
 			$response['message'] = $error ? $error_msg : "VCF file empty!";
 		}
-		
+
 		$this->addActionData($actionType, $response);
 		$GLOBALS["bus"]->addData($this->getResponseData());
 	}
 
-	private function getProp($props, $propname) {
+	private function getProp($props, $propname)
+	{
 		$p = $this->getProperties();
-		if(isset($props["props"][$propname])){
+		if (isset($props["props"][$propname])) {
 			return $props["props"][$propname];
 		}
 		return "";
@@ -299,98 +305,98 @@ class ContactModule extends Module {
 				$vcard->addName($lastname, $firstname, $additional, $prefix, $suffix);
 
 				$company = $this->getProp($messageProps, "company_name");
-				if(!empty($company)) {
+				if (!empty($company)) {
 					$vcard->addCompany($company);
 				}
 
 				$jobtitle = $this->getProp($messageProps, "title");
-				if(!empty($jobtitle)) {
+				if (!empty($jobtitle)) {
 					$vcard->addJobtitle($jobtitle);
 				}
 
 				// MAIL
 				$mail = $this->getProp($messageProps, "email_address_1");
-				if(!empty($mail)) {
+				if (!empty($mail)) {
 					$vcard->addEmail($mail);
 				}
 				$mail = $this->getProp($messageProps, "email_address_2");
-				if(!empty($mail)) {
+				if (!empty($mail)) {
 					$vcard->addEmail($mail);
 				}
 				$mail = $this->getProp($messageProps, "email_address_3");
-				if(!empty($mail)) {
+				if (!empty($mail)) {
 					$vcard->addEmail($mail);
 				}
 
 				// PHONE
 				$wphone = $this->getProp($messageProps, "business_telephone_number");
-				if(!empty($wphone)) {
+				if (!empty($wphone)) {
 					$vcard->addPhoneNumber($wphone, 'WORK');
 				}
 				$wphone = $this->getProp($messageProps, "home_telephone_number");
-				if(!empty($wphone)) {
+				if (!empty($wphone)) {
 					$vcard->addPhoneNumber($wphone, 'HOME');
 				}
 				$wphone = $this->getProp($messageProps, "cellular_telephone_number");
-				if(!empty($wphone)) {
+				if (!empty($wphone)) {
 					$vcard->addPhoneNumber($wphone, 'CELL');
 				}
 				$wphone = $this->getProp($messageProps, "business_fax_number");
-				if(!empty($wphone)) {
+				if (!empty($wphone)) {
 					$vcard->addPhoneNumber($wphone, 'FAX');
 				}
 				$wphone = $this->getProp($messageProps, "pager_telephone_number");
-				if(!empty($wphone)) {
+				if (!empty($wphone)) {
 					$vcard->addPhoneNumber($wphone, 'PAGER');
 				}
 				$wphone = $this->getProp($messageProps, "car_telephone_number");
-				if(!empty($wphone)) {
+				if (!empty($wphone)) {
 					$vcard->addPhoneNumber($wphone, 'CAR');
 				}
 
 				// ADDRESS
 				$addr = $this->getProp($messageProps, "business_address");
-				if(!empty($addr)) {
+				if (!empty($addr)) {
 					$vcard->addAddress(null, null, $this->getProp($messageProps, "business_address_street"), $this->getProp($messageProps, "business_address_city"), $this->getProp($messageProps, "business_address_state"), $this->getProp($messageProps, "business_address_postal_code"), $this->getProp($messageProps, "business_address_country"), "WORK");
 				}
 				$addr = $this->getProp($messageProps, "home_address");
-				if(!empty($addr)) {
+				if (!empty($addr)) {
 					$vcard->addAddress(null, null, $this->getProp($messageProps, "home_address_street"), $this->getProp($messageProps, "home_address_city"), $this->getProp($messageProps, "home_address_state"), $this->getProp($messageProps, "home_address_postal_code"), $this->getProp($messageProps, "home_address_country"), "HOME");
 				}
 				$addr = $this->getProp($messageProps, "other_address");
-				if(!empty($addr)) {
+				if (!empty($addr)) {
 					$vcard->addAddress(null, null, $this->getProp($messageProps, "other_address_street"), $this->getProp($messageProps, "other_address_city"), $this->getProp($messageProps, "other_address_state"), $this->getProp($messageProps, "other_address_postal_code"), $this->getProp($messageProps, "other_address_country"), "OTHER");
 				}
 
 				// MISC
 				$url = $this->getProp($messageProps, "webpage");
-				if(!empty($url)) {
+				if (!empty($url)) {
 					$vcard->addURL($url);
 				}
 
 				$bday = $this->getProp($messageProps, "birthday");
-				if(!empty($bday)) {
+				if (!empty($bday)) {
 					$vcard->addBirthday(date("Y-m-d", $bday));
 				}
 
 				$notes = $this->getProp($messageProps, "body");
-				if(!empty($notes)) {
+				if (!empty($notes)) {
 					$vcard->addNote($notes);
 				}
 
 				$haspicture = $this->getProp($messageProps, "has_picture");
-				if(!empty($haspicture) && $haspicture === true) {
+				if (!empty($haspicture) && $haspicture === true) {
 					$attachnum = -1;
-					if(isset($messageProps["attachments"]) && isset($messageProps["attachments"]["item"])) {
-						foreach($messageProps["attachments"]["item"] as $attachment) {
-							if($attachment["props"]["attachment_contactphoto"] == true) {
+					if (isset($messageProps["attachments"]) && isset($messageProps["attachments"]["item"])) {
+						foreach ($messageProps["attachments"]["item"] as $attachment) {
+							if ($attachment["props"]["attachment_contactphoto"] == true) {
 								$attachnum = $attachment["props"]["attach_num"];
 								break;
 							}
 						}
 					}
 
-					if($attachnum >= 0) {
+					if ($attachnum >= 0) {
 						$attachment = $this->getAttachmentByAttachNum($message, $attachnum); // get first attachment only
 						$phototoken = $this->randomstring(16);
 						$tmpphoto = PLUGIN_CONTACTIMPORTER_TMP_UPLOAD . "photo_" . $phototoken . ".jpg";
@@ -408,7 +414,7 @@ class ContactModule extends Module {
 
 		$response['status'] = true;
 		$response['download_token'] = $token;
-		$response['filename'] = count($records)."contacts.vcf";
+		$response['filename'] = count($records) . "contacts.vcf";
 
 		$this->addActionData($actionType, $response);
 		$GLOBALS["bus"]->addData($this->getResponseData());
@@ -435,16 +441,17 @@ class ContactModule extends Module {
 	 * @param MAPIAttach $attachment attachment which will be dumped to client side
 	 * @return Response response to sent to client including attachment data
 	 */
-	private function storeSavedAttachment($temppath, $attachment) {
+	private function storeSavedAttachment($temppath, $attachment)
+	{
 		// Check if the attachment is opened
-		if($attachment) {
+		if ($attachment) {
 			// Open a stream to get the attachment data
 			$stream = mapi_openproperty($attachment, PR_ATTACH_DATA_BIN, IID_IStream, 0, 0);
 			$stat = mapi_stream_stat($stream);
 
 			// Read the attachment content from the stream
 			$body = '';
-			for($i = 0; $i < $stat['cb']; $i += BLOCK_SIZE) {
+			for ($i = 0; $i < $stat['cb']; $i += BLOCK_SIZE) {
 				$body .= mapi_stream_read($stream, BLOCK_SIZE);
 			}
 
@@ -452,25 +459,26 @@ class ContactModule extends Module {
 		}
 	}
 
-	private function replaceStringPropertyTags($store, $properties) {
+	private function replaceStringPropertyTags($store, $properties)
+	{
 		$newProperties = array();
 
-		$ids = array("name"=>array(), "id"=>array(), "guid"=>array(), "type"=>array()); // this array stores all the information needed to retrieve a named property
+		$ids = array("name" => array(), "id" => array(), "guid" => array(), "type" => array()); // this array stores all the information needed to retrieve a named property
 		$num = 0;
 
 		// caching
 		$guids = array();
 
-		foreach($properties as $name => $val) {
-			if(is_string($val)) {
+		foreach ($properties as $name => $val) {
+			if (is_string($val)) {
 				$split = explode(":", $val);
 
-				if(count($split) != 3) { // invalid string, ignore
-					trigger_error(sprintf("Invalid property: %s \"%s\"",$name,$val), E_USER_NOTICE);
+				if (count($split) != 3) { // invalid string, ignore
+					trigger_error(sprintf("Invalid property: %s \"%s\"", $name, $val), E_USER_NOTICE);
 					continue;
 				}
 
-				if(substr($split[2], 0, 2) == "0x") {
+				if (substr($split[2], 0, 2) == "0x") {
 					$id = hexdec(substr($split[2], 2));
 				} else {
 					$id = $split[2];
@@ -504,19 +512,20 @@ class ContactModule extends Module {
 
 		// get the ids
 		$named = mapi_getidsfromnames($store, $ids["id"], $ids["guid"]);
-		foreach($named as $num => $prop) {
+		foreach ($named as $num => $prop) {
 			$newProperties[$ids["name"][$num]] = mapi_prop_tag(constant($ids["type"][$num]), mapi_prop_id($prop));
 		}
 
 		return $newProperties;
 	}
-	
+
 	/**
 	 * A simple Property map initialization
 	 *
 	 * @return [array] the propertyarray
 	 */
-	private function getProperties() {
+	private function getProperties()
+	{
 		$properties = array();
 
 		$properties["subject"] = PR_SUBJECT;
@@ -596,8 +605,8 @@ class ContactModule extends Module {
 		$properties["radio_telephone_number"] = PR_RADIO_TELEPHONE_NUMBER;
 		$properties["telex_telephone_number"] = PR_TELEX_NUMBER;
 		$properties["ttytdd_telephone_number"] = PR_TTYTDD_PHONE_NUMBER;
-		$properties["business_telephone_number"] =PR_BUSINESS_TELEPHONE_NUMBER;
-		
+		$properties["business_telephone_number"] = PR_BUSINESS_TELEPHONE_NUMBER;
+
 		// Additional fax properties
 		$properties["fax_1_address_type"] = "PT_STRING8:PSETID_Address:0x80B2";
 		$properties["fax_1_email_address"] = "PT_STRING8:PSETID_Address:0x80B3";
@@ -643,10 +652,10 @@ class ContactModule extends Module {
 		$properties["anniversary_eventid"] = "PT_BINARY:PSETID_Address:0x804E";
 
 		$properties["notes"] = PR_BODY;
-		
+
 		// hasimage
 		$properties["picture"] = "PT_BOOLEAN:{00062004-0000-0000-C000-000000000046}:0x8015";
-		
+
 		return $properties;
 	}
 
@@ -655,11 +664,12 @@ class ContactModule extends Module {
 	 * @param $actionType
 	 * @param $actionData
 	 */
-	private function loadContacts($actionType, $actionData) {
+	private function loadContacts($actionType, $actionData)
+	{
 		$error = false;
 		$error_msg = "";
-		
-		if(is_readable ($actionData["vcf_filepath"])) {
+
+		if (is_readable($actionData["vcf_filepath"])) {
 			$parser = null;
 
 			try {
@@ -668,58 +678,59 @@ class ContactModule extends Module {
 				$error = true;
 				$error_msg = $e->getMessage();
 			}
-			if($error) {
-				$response['status']	= false;
-				$response['message']= $error_msg;
+			if ($error) {
+				$response['status'] = false;
+				$response['message'] = $error_msg;
 			} else {
-				if(iterator_count($parser) == 0) {
-					$response['status']	= false;
-					$response['message']= "No contacts in vcf file";
+				if (iterator_count($parser) == 0) {
+					$response['status'] = false;
+					$response['message'] = "No contacts in vcf file";
 				} else {
-					$response['status']		= true;
-					$response['parsed_file']= $actionData["vcf_filepath"];
-					$response['parsed']		= array (
-						'contacts'	=>	$this->parseContactsToArray($parser)
+					$response['status'] = true;
+					$response['parsed_file'] = $actionData["vcf_filepath"];
+					$response['parsed'] = array(
+						'contacts' => $this->parseContactsToArray($parser)
 					);
 				}
 			}
 		} else {
-			$response['status']	= false;
-			$response['message']= "File could not be read by server";
+			$response['status'] = false;
+			$response['message'] = "File could not be read by server";
 		}
-		
+
 		$this->addActionData($actionType, $response);
 		$GLOBALS["bus"]->addData($this->getResponseData());
-		
-		if($this->DEBUG) {
+
+		if ($this->DEBUG) {
 			error_log("parsing done, bus data written!");
 		}
 	}
-	
+
 	/**
 	 * Create a array with contacts
-	 * 
+	 *
 	 * @param contacts vcard or csv contacts
 	 * @param csv optional, true if contacts are csv contacts
 	 * @return array parsed contacts
 	 * @private
 	 */
-	private function parseContactsToArray($contacts, $csv = false) {
+	private function parseContactsToArray($contacts, $csv = false)
+	{
 		$carr = array();
-		
-		if(!$csv) {
+
+		if (!$csv) {
 			foreach ($contacts as $Index => $vCard) {
 				$properties = array();
 				if (isset($vCard->fullname)) {
 					$properties["display_name"] = $vCard->fullname;
 					$properties["fileas"] = $vCard->fullname;
-				} elseif(!isset($vCard->organization)) {
+				} elseif (!isset($vCard->organization)) {
 					error_log("Skipping entry! No fullname/organization given.");
 					continue;
 				}
 
 				$properties["hide_attachments"] = true;
-				
+
 				//uid - used for front/backend communication
 				$properties["internal_fields"] = array();
 				$properties["internal_fields"]["contact_uid"] = base64_encode($Index . $properties["fileas"]);
@@ -732,22 +743,36 @@ class ContactModule extends Module {
 				if (isset($vCard->phone) && count($vCard->phone) > 0) {
 					foreach ($vCard->phone as $type => $number) {
 						$number = $number[0]; // we only can store one number
-						if($this->startswith(strtolower($type), "home") || strtolower($type) === "default") {
+						if ($this->startswith(strtolower($type), "home") || strtolower($type) === "default") {
 							$properties["home_telephone_number"] = $number;
-						} else if($this->startswith(strtolower($type), "cell")) {
-							$properties["cellular_telephone_number"] = $number;
-						} else if($this->startswith(strtolower($type), "work")) {
-							$properties["business_telephone_number"] = $number;
-						} else if($this->startswith(strtolower($type), "fax")) {
-							$properties["business_fax_number"] = $number;
-						} else if($this->startswith(strtolower($type), "pager")) {
-							$properties["pager_telephone_number"] = $number;
-						} else if($this->startswith(strtolower($type), "isdn")) {
-							$properties["isdn_number"] = $number;
-						} else if($this->startswith(strtolower($type), "car")) {
-							$properties["car_telephone_number"] = $number;
-						} else if($this->startswith(strtolower($type), "modem")) {
-							$properties["ttytdd_telephone_number"] = $number;
+						} else {
+							if ($this->startswith(strtolower($type), "cell")) {
+								$properties["cellular_telephone_number"] = $number;
+							} else {
+								if ($this->startswith(strtolower($type), "work")) {
+									$properties["business_telephone_number"] = $number;
+								} else {
+									if ($this->startswith(strtolower($type), "fax")) {
+										$properties["business_fax_number"] = $number;
+									} else {
+										if ($this->startswith(strtolower($type), "pager")) {
+											$properties["pager_telephone_number"] = $number;
+										} else {
+											if ($this->startswith(strtolower($type), "isdn")) {
+												$properties["isdn_number"] = $number;
+											} else {
+												if ($this->startswith(strtolower($type), "car")) {
+													$properties["car_telephone_number"] = $number;
+												} else {
+													if ($this->startswith(strtolower($type), "modem")) {
+														$properties["ttytdd_telephone_number"] = $number;
+													}
+												}
+											}
+										}
+									}
+								}
+							}
 						}
 					}
 				}
@@ -763,17 +788,17 @@ class ContactModule extends Module {
 
 							// we only have storage for 3 mail addresses!
 							/**
-							 * type of email address		address_book_mv			address_book_long
-							 *	email1						0						1 (0x00000001)
-							 *	email2						1						2 (0x00000002)
-							 *	email3						2						4 (0x00000004)
-							 *	fax2(business fax)			3						8 (0x00000008)
-							 *	fax3(home fax)				4						16 (0x00000010)
-							 *	fax1(primary fax)			5						32 (0x00000020)
+							 * type of email address        address_book_mv            address_book_long
+							 *    email1                        0                        1 (0x00000001)
+							 *    email2                        1                        2 (0x00000002)
+							 *    email3                        2                        4 (0x00000004)
+							 *    fax2(business fax)            3                        8 (0x00000008)
+							 *    fax3(home fax)                4                        16 (0x00000010)
+							 *    fax1(primary fax)            5                        32 (0x00000020)
 							 *
-							 *	address_book_mv is a multivalued property so all the values are passed in array
-							 *	address_book_long stores sum of the flags
-							 *	these both properties should be in sync always
+							 *    address_book_mv is a multivalued property so all the values are passed in array
+							 *    address_book_long stores sum of the flags
+							 *    these both properties should be in sync always
 							 */
 							switch ($emailcount) {
 								case 0:
@@ -806,7 +831,7 @@ class ContactModule extends Module {
 				}
 				if (isset($vCard->organization)) {
 					$properties["company_name"] = $vCard->organization;
-					if(empty($properties["display_name"])) {
+					if (empty($properties["display_name"])) {
 						$properties["display_name"] = $vCard->organization; // if we have no displayname - use the company name as displayname
 						$properties["fileas"] = $vCard->organization;
 					}
@@ -825,9 +850,9 @@ class ContactModule extends Module {
 
 					foreach ($vCard->address as $type => $address) {
 						$address = $address[0]; // we only can store one address per type
-						if($this->startswith(strtolower($type), "work")) {
+						if ($this->startswith(strtolower($type), "work")) {
 							$properties["business_address_street"] = $address->street;
-							if(!empty($address->extended)) {
+							if (!empty($address->extended)) {
 								$properties["business_address_street"] .= "\n" . $address->extended;
 							}
 							$properties["business_address_city"] = $address->city;
@@ -835,26 +860,28 @@ class ContactModule extends Module {
 							$properties["business_address_postal_code"] = $address->zip;
 							$properties["business_address_country"] = $address->country;
 							$properties["business_address"] = $this->buildAddressString($properties["business_address_street"], $address->zip, $address->city, $address->region, $address->country);
-						} else if($this->startswith(strtolower($type), "home")) {
-							$properties["home_address_street"] = $address->street;
-							if(!empty($address->extended)) {
-								$properties["home_address_street"] .= "\n" . $address->extended;
-							}
-							$properties["home_address_city"] = $address->city;
-							$properties["home_address_state"] = $address->region;
-							$properties["home_address_postal_code"] = $address->zip;
-							$properties["home_address_country"] = $address->country;
-							$properties["home_address"] = $this->buildAddressString($properties["home_address_street"], $address->zip, $address->city, $address->region, $address->country);
 						} else {
-							$properties["other_address_street"] = $address->street;
-							if(!empty($address->extended)) {
-								$properties["other_address_street"] .= "\n" . $address->extended;
+							if ($this->startswith(strtolower($type), "home")) {
+								$properties["home_address_street"] = $address->street;
+								if (!empty($address->extended)) {
+									$properties["home_address_street"] .= "\n" . $address->extended;
+								}
+								$properties["home_address_city"] = $address->city;
+								$properties["home_address_state"] = $address->region;
+								$properties["home_address_postal_code"] = $address->zip;
+								$properties["home_address_country"] = $address->country;
+								$properties["home_address"] = $this->buildAddressString($properties["home_address_street"], $address->zip, $address->city, $address->region, $address->country);
+							} else {
+								$properties["other_address_street"] = $address->street;
+								if (!empty($address->extended)) {
+									$properties["other_address_street"] .= "\n" . $address->extended;
+								}
+								$properties["other_address_city"] = $address->city;
+								$properties["other_address_state"] = $address->region;
+								$properties["other_address_postal_code"] = $address->zip;
+								$properties["other_address_country"] = $address->country;
+								$properties["other_address"] = $this->buildAddressString($properties["other_address_street"], $address->zip, $address->city, $address->region, $address->country);
 							}
-							$properties["other_address_city"] = $address->city;
-							$properties["other_address_state"] = $address->region;
-							$properties["other_address_postal_code"] = $address->zip;
-							$properties["other_address_country"] = $address->country;
-							$properties["other_address"] = $this->buildAddressString($properties["other_address_street"], $address->zip, $address->city, $address->region, $address->country);
 						}
 					}
 				}
@@ -865,23 +892,23 @@ class ContactModule extends Module {
 					$properties["notes"] = $vCard->note;
 				}
 				if (isset($vCard->rawPhoto) || isset($vCard->photo)) {
-					if(!is_writable(TMP_PATH . "/")) {
+					if (!is_writable(TMP_PATH . "/")) {
 						error_log("Can not write to export tmp directory!");
 					} else {
 						$tmppath = TMP_PATH . "/" . $this->randomstring(15);
-						if(isset($vCard->rawPhoto)) {
-							if(file_put_contents($tmppath, $vCard->rawPhoto)) {
+						if (isset($vCard->rawPhoto)) {
+							if (file_put_contents($tmppath, $vCard->rawPhoto)) {
 								$properties["internal_fields"]["x_photo_path"] = $tmppath;
 							}
-						} elseif(isset($vCard->photo)) {
-							if($this->startswith(strtolower($vCard->photo), "http://") || $this->startswith(strtolower($vCard->photo), "https://")) { // check if it starts with http
-								$ctx = stream_context_create(array('http'=>
+						} elseif (isset($vCard->photo)) {
+							if ($this->startswith(strtolower($vCard->photo), "http://") || $this->startswith(strtolower($vCard->photo), "https://")) { // check if it starts with http
+								$ctx = stream_context_create(array('http' =>
 									array(
 										'timeout' => 3,  //3 Seconds timout
 									)
 								));
 
-								if(file_put_contents($tmppath, file_get_contents($vCard->photo, false, $ctx))) {
+								if (file_put_contents($tmppath, file_get_contents($vCard->photo, false, $ctx))) {
 									$properties["internal_fields"]["x_photo_path"] = $tmppath;
 								}
 							} else {
@@ -895,10 +922,10 @@ class ContactModule extends Module {
 		} else {
 			error_log("csv parsing not implemented");
 		}
-		
+
 		return $carr;
 	}
-	
+
 	/**
 	 * Generate the whole addressstring
 	 *
@@ -910,38 +937,52 @@ class ContactModule extends Module {
 	 * @return string the concatinated address string
 	 * @private
 	 */
-	private function buildAddressString($street, $zip, $city, $state, $country) {
+	private function buildAddressString($street, $zip, $city, $state, $country)
+	{
 		$out = "";
 
-		if (isset($country) && $street != "") $out = $country;
+		if (isset($country) && $street != "") {
+			$out = $country;
+		}
 
 		$zcs = "";
-		if (isset($zip) && $zip != "") $zcs = $zip;
-		if (isset($city) && $city != "") $zcs .= (($zcs)?" ":"") . $city;
-		if (isset($state) && $state != "") $zcs .= (($zcs)?" ":"") . $state;
-		if ($zcs) $out = $zcs . "\n" . $out;
+		if (isset($zip) && $zip != "") {
+			$zcs = $zip;
+		}
+		if (isset($city) && $city != "") {
+			$zcs .= (($zcs) ? " " : "") . $city;
+		}
+		if (isset($state) && $state != "") {
+			$zcs .= (($zcs) ? " " : "") . $state;
+		}
+		if ($zcs) {
+			$out = $zcs . "\n" . $out;
+		}
 
-		if (isset($street) && $street != "") $out = $street . (($out)?"\n\n". $out: "") ;
+		if (isset($street) && $street != "") {
+			$out = $street . (($out) ? "\n\n" . $out : "");
+		}
 
 		return $out;
 	}
-	
+
 	/**
 	 * Store the file to a temporary directory
 	 * @param $actionType
 	 * @param $actionData
 	 * @private
 	 */
-	private function getAttachmentPath($actionType, $actionData) {
+	private function getAttachmentPath($actionType, $actionData)
+	{
 		// Get store id
 		$storeid = false;
-		if(isset($actionData["store"])) {
+		if (isset($actionData["store"])) {
 			$storeid = $actionData["store"];
 		}
 
 		// Get message entryid
 		$entryid = false;
-		if(isset($actionData["entryid"])) {
+		if (isset($actionData["entryid"])) {
 			$entryid = $actionData["entryid"];
 		}
 
@@ -950,42 +991,41 @@ class ContactModule extends Module {
 
 		// Get number of attachment which should be opened.
 		$attachNum = false;
-		if(isset($actionData["attachNum"])) {
+		if (isset($actionData["attachNum"])) {
 			$attachNum = $actionData["attachNum"];
 		}
 
 		// Check if storeid and entryid isset
-		if($storeid && $entryid) {
+		if ($storeid && $entryid) {
 			// Open the store
 			$store = $GLOBALS["mapisession"]->openMessageStore(hex2bin($storeid));
-			
-			if($store) {
+
+			if ($store) {
 				// Open the message
 				$message = mapi_msgstore_openentry($store, hex2bin($entryid));
-				
-				if($message) {
+
+				if ($message) {
 					$attachment = false;
 
 					// Check if attachNum isset
-					if($attachNum) {
+					if ($attachNum) {
 						// Loop through the attachNums, message in message in message ...
-						for($i = 0; $i < (count($attachNum) - 1); $i++)
-						{
+						for ($i = 0; $i < (count($attachNum) - 1); $i++) {
 							// Open the attachment
-							$tempattach = mapi_message_openattach($message, (int) $attachNum[$i]);
-							if($tempattach) {
+							$tempattach = mapi_message_openattach($message, (int)$attachNum[$i]);
+							if ($tempattach) {
 								// Open the object in the attachment
 								$message = mapi_attach_openobj($tempattach);
 							}
 						}
 
 						// Open the attachment
-						$attachment = mapi_message_openattach($message, (int) $attachNum[(count($attachNum) - 1)]);
+						$attachment = mapi_message_openattach($message, (int)$attachNum[(count($attachNum) - 1)]);
 					}
 
 					// Check if the attachment is opened
-					if($attachment) {
-						
+					if ($attachment) {
+
 						// Get the props of the attachment
 						$props = mapi_attach_getprops($attachment, array(PR_ATTACH_LONG_FILENAME, PR_ATTACH_MIME_TAG, PR_DISPLAY_NAME, PR_ATTACH_METHOD));
 						// Content Type
@@ -994,29 +1034,33 @@ class ContactModule extends Module {
 						$filename = "ERROR";
 
 						// Set filename
-						if(isset($props[PR_ATTACH_LONG_FILENAME])) {
+						if (isset($props[PR_ATTACH_LONG_FILENAME])) {
 							$filename = $props[PR_ATTACH_LONG_FILENAME];
-						} else if(isset($props[PR_ATTACH_FILENAME])) {
-							$filename = $props[PR_ATTACH_FILENAME];
-						} else if(isset($props[PR_DISPLAY_NAME])) {
-							$filename = $props[PR_DISPLAY_NAME];
-						} 
-				
+						} else {
+							if (isset($props[PR_ATTACH_FILENAME])) {
+								$filename = $props[PR_ATTACH_FILENAME];
+							} else {
+								if (isset($props[PR_DISPLAY_NAME])) {
+									$filename = $props[PR_DISPLAY_NAME];
+								}
+							}
+						}
+
 						// Set content type
-						if(isset($props[PR_ATTACH_MIME_TAG])) {
+						if (isset($props[PR_ATTACH_MIME_TAG])) {
 							$contentType = $props[PR_ATTACH_MIME_TAG];
 						} else {
 							// Parse the extension of the filename to get the content type
-							if(strrpos($filename, ".") !== false) {
+							if (strrpos($filename, ".") !== false) {
 								$extension = strtolower(substr($filename, strrpos($filename, ".")));
 								$contentType = "application/octet-stream";
-								if (is_readable("mimetypes.dat")){
-									$fh = fopen("mimetypes.dat","r");
+								if (is_readable("mimetypes.dat")) {
+									$fh = fopen("mimetypes.dat", "r");
 									$ext_found = false;
-									while (!feof($fh) && !$ext_found){
+									while (!feof($fh) && !$ext_found) {
 										$line = fgets($fh);
 										preg_match("/(\.[a-z0-9]+)[ \t]+([^ \t\n\r]*)/i", $line, $result);
-										if ($extension == $result[1]){
+										if ($extension == $result[1]) {
 											$ext_found = true;
 											$contentType = $result[2];
 										}
@@ -1025,24 +1069,24 @@ class ContactModule extends Module {
 								}
 							}
 						}
-						
-						
+
+
 						$tmpname = tempnam(TMP_PATH, stripslashes($filename));
 
 						// Open a stream to get the attachment data
 						$stream = mapi_openpropertytostream($attachment, PR_ATTACH_DATA_BIN);
 						$stat = mapi_stream_stat($stream);
 						// File length =  $stat["cb"]
-						
-						$fhandle = fopen($tmpname,'w');
+
+						$fhandle = fopen($tmpname, 'w');
 						$buffer = null;
-						for($i = 0; $i < $stat["cb"]; $i += BLOCK_SIZE) {
+						for ($i = 0; $i < $stat["cb"]; $i += BLOCK_SIZE) {
 							// Write stream
 							$buffer = mapi_stream_read($stream, BLOCK_SIZE);
-							fwrite($fhandle,$buffer,strlen($buffer));
+							fwrite($fhandle, $buffer, strlen($buffer));
 						}
 						fclose($fhandle);
-						
+
 						$response = array();
 						$response['tmpname'] = $tmpname;
 						$response['filename'] = $filename;
@@ -1065,10 +1109,13 @@ class ContactModule extends Module {
 		}
 	}
 
-	private function startswith($haystack, $needle) {
+	private function startswith($haystack, $needle)
+	{
 		$haystack = str_replace("type=", "", $haystack); // remove type from string
 		return substr($haystack, 0, strlen($needle)) === $needle;
 	}
-};
+}
+
+;
 
 ?>

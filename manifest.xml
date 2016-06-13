@@ -22,7 +22,7 @@
 				<client>
 					<clientfile load="release">js/contactimporter-debug.js</clientfile>
 					<clientfile load="debug">js/contactimporter-debug.js</clientfile>
-					
+
 					<clientfile load="source">js/plugin.contactimporter.js</clientfile>
 					<clientfile load="source">js/ABOUT.js</clientfile>
 					<clientfile load="source">js/data/ResponseHandler.js</clientfile>

@@ -2,7 +2,7 @@
  * ResponseHandler.js zarafa contact im/exporter
  *
  * Author: Christoph Haas <christoph.h@sprinternet.at>
- * Copyright (C) 2012-2013 Christoph Haas
+ * Copyright (C) 2012-2016 Christoph Haas
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
- 
+
 /**
  * ResponseHandler
  *
@@ -38,21 +38,13 @@ Zarafa.plugins.contactimporter.data.ResponseHandler = Ext.extend(Zarafa.core.dat
 	 * @cfg {Function} successCallback The function which
 	 * will be called after success request.
 	 */
-	successCallback : null,
-		
+	successCallback: null,
+
 	/**
 	 * Call the successCallback callback function.
 	 * @param {Object} response Object contained the response data.
 	 */
-	doLoad : function(response) {
-		this.successCallback(response);
-	},
-	
-	/**
-	 * Call the successCallback callback function.
-	 * @param {Object} response Object contained the response data.
-	 */
-	doImport : function(response) {
+	doLoad: function (response) {
 		this.successCallback(response);
 	},
 
@@ -60,24 +52,32 @@ Zarafa.plugins.contactimporter.data.ResponseHandler = Ext.extend(Zarafa.core.dat
 	 * Call the successCallback callback function.
 	 * @param {Object} response Object contained the response data.
 	 */
-	doExport : function(response) {
+	doImport: function (response) {
 		this.successCallback(response);
 	},
-	
+
 	/**
 	 * Call the successCallback callback function.
 	 * @param {Object} response Object contained the response data.
 	 */
-	doImportattachment : function(response) {
+	doExport: function (response) {
 		this.successCallback(response);
 	},
-		
+
+	/**
+	 * Call the successCallback callback function.
+	 * @param {Object} response Object contained the response data.
+	 */
+	doImportattachment: function (response) {
+		this.successCallback(response);
+	},
+
 	/**
 	 * In case exception happened on server, server will return
 	 * exception response with the code of exception.
 	 * @param {Object} response Object contained the response data.
 	 */
-	doError: function(response)	{
+	doError: function (response) {
 		alert("error response code: " + response.error.info.code);
 	}
 });

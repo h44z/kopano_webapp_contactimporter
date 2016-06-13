@@ -3,7 +3,7 @@
  * upload.php, zarafa contact to vcf im/exporter
  *
  * Author: Christoph Haas <christoph.h@sprinternet.at>
- * Copyright (C) 2012-2013 Christoph Haas
+ * Copyright (C) 2012-2016 Christoph Haas
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,17 +20,18 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
- 
+
 require_once("../config.php");
 
 /* disable error printing - otherwise json communication might break... */
 ini_set('display_errors', '0');
 
- /**
-  * respond/echo JSON
-  * @param $arr 
-  */
-function respondJSON($arr) {
+/**
+ * respond/echo JSON
+ * @param $arr
+ */
+function respondJSON($arr)
+{
 	echo json_encode($arr);
 }
 
@@ -39,11 +40,12 @@ function respondJSON($arr) {
  * @param $length the lenght of the generated string
  * @return string a random string
  */
-function randomstring($length = 6) {
+function randomstring($length = 6)
+{
 	// $chars - all allowed charakters
 	$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 
-	srand((double)microtime()*1000000);
+	srand((double)microtime() * 1000000);
 	$i = 0;
 	$pass = "";
 	while ($i < $length) {
@@ -58,15 +60,15 @@ function randomstring($length = 6) {
 $destpath = PLUGIN_CONTACTIMPORTER_TMP_UPLOAD;
 $destpath .= $_FILES['vcfdata']['name'] . randomstring();
 
-if(is_readable ($_FILES['vcfdata']['tmp_name'])) {
-	$result = move_uploaded_file($_FILES['vcfdata']['tmp_name'],$destpath);
-	
-	if($result) {
-		respondJSON(array ('success'=>true, 'vcf_file'=>$destpath));
+if (is_readable($_FILES['vcfdata']['tmp_name'])) {
+	$result = move_uploaded_file($_FILES['vcfdata']['tmp_name'], $destpath);
+
+	if ($result) {
+		respondJSON(array('success' => true, 'vcf_file' => $destpath));
 	} else {
-		respondJSON(array ('success'=>false,'error'=>"File could not be moved to TMP path! Check plugin config and folder permissions!"));
+		respondJSON(array('success' => false, 'error' => "File could not be moved to TMP path! Check plugin config and folder permissions!"));
 	}
 } else {
-	respondJSON(array ('success'=>false,'error'=>"File could not be read by server, upload error!"));
+	respondJSON(array('success' => false, 'error' => "File could not be read by server, upload error!"));
 }
 ?>
