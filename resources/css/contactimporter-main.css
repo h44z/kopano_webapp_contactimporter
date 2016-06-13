@@ -2,7 +2,6 @@
     background: url(../images/import_icon.png) no-repeat !important;
     background-repeat: no-repeat;
     background-position: center;
-    background-size: 18px !important;
 }
 
 .icon_contactimporter_export {
@@ -19,12 +18,13 @@
 
 .zarafa-ciplg-container {
     width: 100%;
-    height: 30px;
+    height: 50px;
 }
 
 .zarafa-ciplg-button .x-btn-small {
     width: 80%;
-    height: 25px;
-    margin-left: auto;
-    margin-right: auto;
+    height: 30px;
+    margin-left: 10%;
+    margin-right: 10%;
+    margin-top: 10px;
 }

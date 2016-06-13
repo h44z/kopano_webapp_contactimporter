@@ -48,36 +48,8 @@ Zarafa.plugins.contactimporter.ImportPlugin = Ext.extend(Zarafa.core.Plugin, {		
 		/* directly import received vcfs */
 		this.registerInsertionPoint('common.contextmenu.attachment.actions', this.createAttachmentImportButton, this);
 
-		/* add import button to south navigation */
-		this.registerInsertionPoint("navigation.south", this.createImportButton, this);
-
 		/* export a contact via rightclick */
 		this.registerInsertionPoint('context.contact.contextmenu.actions', this.createItemExportInsertionPoint, this);
-	},
-
-	/**
-	 * Creates the button
-	 *
-	 * @return {Object} Configuration object for a {@link Ext.Button button}
-	 *
-	 */
-	createImportButton: function () {
-		var button = {
-			xtype: 'panel',
-			cls: 'zarafa-ciplg-container',
-			layout: 'fit',
-			navigationContext: container.getContextByName('contact'),
-			items: [{
-				xtype            : 'button',
-				text             : _('Import Contacts'),
-				iconCls          : 'icon_contactimporter_button',
-				cls: 'zarafa-ciplg-button',
-				handler          : this.onImportButtonClick,
-				scope            : this
-			}]
-		};
-
-		return button;
 	},
 
 	/**
@@ -89,7 +61,7 @@ Zarafa.plugins.contactimporter.ImportPlugin = Ext.extend(Zarafa.core.Plugin, {		
 	 */
 	createItemExportInsertionPoint: function (include, btn) {
 		return {
-			text   : dgettext('plugin_files', 'Export VCF'),
+			text   : dgettext('plugin_files', 'Export vCard'),
 			handler: this.exportToVCF.createDelegate(this, [btn]),
 			scope  : this,
 			iconCls: 'icon_contactimporter_export'
@@ -156,7 +128,7 @@ Zarafa.plugins.contactimporter.ImportPlugin = Ext.extend(Zarafa.core.Plugin, {		
 	 */
 	createAttachmentImportButton: function (include, btn) {
 		return {
-			text      : _('Import Contacts'),
+			text      : _('Import to Contacts'),
 			handler   : this.getAttachmentFileName.createDelegate(this, [btn]),
 			scope     : this,
 			iconCls   : 'icon_contactimporter_button',
@@ -249,13 +221,6 @@ Zarafa.plugins.contactimporter.ImportPlugin = Ext.extend(Zarafa.core.Plugin, {		
 			},
 			responseHandler
 		);
-	},
-
-	/**
-	 * Clickhandler for the button
-	 */
-	onImportButtonClick: function () {
-		this.openImportDialog();
 	},
 
 	/**
