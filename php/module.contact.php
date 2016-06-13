@@ -551,6 +551,8 @@ class ContactModule extends Module {
 							case 0:
 								$properties["email_address_1"] = $email;
 								$properties["email_address_display_name_1"] = $fileas . " (" . $email . ")";
+								$properties["address_book_mv"] = [0]; // this is needed for adding the contact to the email address book, 0 = email 1
+								$properties["address_book_long"] = 1; // this specifies the number of elements in address_book_mv
 								break;
 							case 1:
 								$properties["email_address_2"] = $email;
