@@ -94,15 +94,6 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 						this.parseContacts(this.vcffile);
 					}
 				},
-				close: function (cmp) {
-					Ext.getCmp("importcontactsbutton").enable();
-				},
-				hide: function (cmp) {
-					Ext.getCmp("importcontactsbutton").enable();
-				},
-				destroy: function (cmp) {
-					Ext.getCmp("importcontactsbutton").enable();
-				},
 				scope: this
 			}
 		});
@@ -486,7 +477,6 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 	},
 	
 	importContactsDone : function (response) {
-		console.log(response);
 		this.loadMask.hide();
 		this.dialog.close();
 		if(response.status == true) {

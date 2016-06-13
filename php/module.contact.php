@@ -21,9 +21,11 @@
  *
  */
  
-include_once('vcf/class.vCard.php');
-require_once('mapi/mapitags.php' );
- 
+include_once('vendor/autoload.php');
+
+use JeroenDesloovere\VCard\VCard;
+use JeroenDesloovere\VCard\VCardParser;
+
 class ContactModule extends Module {
 
 	private $DEBUG = false; 	// enable error_log debugging
@@ -142,8 +144,9 @@ class ContactModule extends Module {
 		$error_msg = "";
 		
 		// parse the vcf file a last time...
+		$parser = null;
 		try {
-			$vcard = new vCard($vcffile, false, array('Collapse' => false)); // Parse it!
+			$parser = VCardParser::parseFromFile($vcffile);
 		} catch (Exception $e) {
 			$error = true;
 			$error_msg = $e->getMessage();
@@ -151,13 +154,8 @@ class ContactModule extends Module {
 		
 		$contacts = array();
 		
-		if(!$error && count($vcard) > 0) {
-			$vCard = $vcard;
-			if (count($vCard) == 1) {
-				$vCard = array($vcard);
-			}
-				
-			$contacts = $this->parseContactsToArray($vCard);
+		if(!$error && iterator_count($parser) > 0) {
+			$contacts = $this->parseContactsToArray($parser);
 			$store = $GLOBALS["mapisession"]->openMessageStore(hex2bin($storeid));
 			$folder = mapi_msgstore_openentry($store, hex2bin($folderid));
 			
@@ -172,7 +170,7 @@ class ContactModule extends Module {
 			$count = 0;
 			
 			// iterate through all contacts and import them :)
-			foreach($contacts as $contact) {							
+			foreach($contacts as $contact) {
 				if (isset($contact["display_name"]) && ($importall || in_array($contact["internal_fields"]["contact_uid"], $uids))) {
 					// parse the arraykeys
 					// TODO: this is very slow... 
@@ -194,7 +192,7 @@ class ContactModule extends Module {
 						$contactPicture = file_get_contents($contact["internal_fields"]["x_photo_path"]);
 						$attach = mapi_message_createattach($message);
 		
-						// Set properties of the attachment		
+						// Set properties of the attachment
 						$propValuesIMG = array(
 							PR_ATTACH_SIZE => strlen($contactPicture),
 							PR_ATTACH_LONG_FILENAME => 'ContactPicture.jpg',
@@ -224,7 +222,7 @@ class ContactModule extends Module {
 					mapi_savechanges($message);
 					if($this->DEBUG) {
 						error_log("New contact added: \"" . $propValuesMAPI[$properties["display_name"]] . "\".\n");
-					}					
+					}
 					$count++;
 				}
 			}
@@ -450,8 +448,10 @@ class ContactModule extends Module {
 		$error_msg = "";
 		
 		if(is_readable ($actionData["vcf_filepath"])) {
+			$parser = null;
+
 			try {
-				$vcard = new vCard($actionData["vcf_filepath"], false, array('Collapse' => false)); // Parse it!
+				$parser = VCardParser::parseFromFile($actionData["vcf_filepath"]);
 			} catch (Exception $e) {
 				$error = true;
 				$error_msg = $e->getMessage();
@@ -460,19 +460,14 @@ class ContactModule extends Module {
 				$response['status']	= false;
 				$response['message']= $error_msg;
 			} else {
-				if(count($vcard) == 0) {
+				if(iterator_count($parser) == 0) {
 					$response['status']	= false;
 					$response['message']= "No contacts in vcf file";
 				} else {
-					$vCard = $vcard;
-					if (count($vCard) == 1) {
-						$vCard = array($vcard);
-					}
-					
 					$response['status']		= true;
 					$response['parsed_file']= $actionData["vcf_filepath"];
 					$response['parsed']		= array (
-						'contacts'	=>	$this->parseContactsToArray($vCard)
+						'contacts'	=>	$this->parseContactsToArray($parser)
 					);
 				}
 			}
@@ -503,141 +498,156 @@ class ContactModule extends Module {
 		if(!$csv) {
 			foreach ($contacts as $Index => $vCard) {
 				$properties = array();
-				$properties["display_name"] = $vCard -> FN[0];
-				$properties["fileas"] = $vCard -> FN[0];
+				if (isset($vCard->fullname)) {
+					$properties["display_name"] = $vCard->fullname;
+					$properties["fileas"] = $vCard->fullname;
+				} elseif(!isset($vCard->organization)) {
+					error_log("Skipping entry! No fullname/organization given.");
+					continue;
+				}
 				
 				//uid - used for front/backend communication
 				$properties["internal_fields"] = array();
 				$properties["internal_fields"]["contact_uid"] = base64_encode($Index . $properties["fileas"]);
-				
-				foreach ($vCard -> N as $Name) {
-					$properties["given_name"] = $Name['FirstName'];
-					$properties["middle_name"] = $Name['AdditionalNames'];
-					$properties["surname"] = $Name['LastName'];
-					$properties["display_name_prefix"] = $Name['Prefixes'];
-				}
-				if ($vCard -> TEL) {
-					foreach ($vCard -> TEL as $Tel) {
-						if(!is_scalar($Tel)) {
-							if(in_array("home", $Tel['Type'])) {
-								$properties["home_telephone_number"] = $Tel['Value'];
-							} else if(in_array("cell", $Tel['Type'])) {
-								$properties["cellular_telephone_number"] = $Tel['Value'];
-							} else if(in_array("work", $Tel['Type'])) {
-								$properties["business_telephone_number"] = $Tel['Value'];
-							} else if(in_array("fax", $Tel['Type'])) {
-								$properties["business_fax_number"] = $Tel['Value'];
-							} else if(in_array("pager", $Tel['Type'])) {
-								$properties["pager_telephone_number"] = $Tel['Value'];
-							} else if(in_array("isdn", $Tel['Type'])) {
-								$properties["isdn_number"] = $Tel['Value'];
-							} else if(in_array("car", $Tel['Type'])) {
-								$properties["car_telephone_number"] = $Tel['Value'];
-							} else if(in_array("modem", $Tel['Type'])) {
-								$properties["ttytdd_telephone_number"] = $Tel['Value'];
-							}
+
+				$properties["given_name"] = $vCard->firstname;
+				$properties["middle_name"] = $vCard->additional;
+				$properties["surname"] = $vCard->lastname;
+				$properties["display_name_prefix"] = $vCard->prefix;
+
+				if (isset($vCard->phone) && count($vCard->phone) > 0) {
+					foreach ($vCard->phone as $type => $number) {
+						$number = $number[0]; // we only can store one number
+						if($this->startswith(strtolower($type), "home") || strtolower($type) === "default") {
+							$properties["home_telephone_number"] = $number;
+						} else if($this->startswith(strtolower($type), "cell")) {
+							$properties["cellular_telephone_number"] = $number;
+						} else if($this->startswith(strtolower($type), "work")) {
+							$properties["business_telephone_number"] = $number;
+						} else if($this->startswith(strtolower($type), "fax")) {
+							$properties["business_fax_number"] = $number;
+						} else if($this->startswith(strtolower($type), "pager")) {
+							$properties["pager_telephone_number"] = $number;
+						} else if($this->startswith(strtolower($type), "isdn")) {
+							$properties["isdn_number"] = $number;
+						} else if($this->startswith(strtolower($type), "car")) {
+							$properties["car_telephone_number"] = $number;
+						} else if($this->startswith(strtolower($type), "modem")) {
+							$properties["ttytdd_telephone_number"] = $number;
 						}
 					}
 				}
-				if ($vCard -> EMAIL) {
-					$e=0;
-					foreach ($vCard -> EMAIL as $Email) {
-						$fileas = $Email['Value'];
+				if (isset($vCard->email) && count($vCard->email) > 0) {
+					$emailcount = 0;
+					foreach ($vCard->email as $type => $email) {
+						$email = $email[0]; // we only can store one mail address
+						$fileas = $email;
 						if(isset($properties["fileas"]) && !empty($properties["fileas"])) {
-							$fileas = $properties["fileas"];
+							$fileas = $properties["fileas"]; // set to real name
 						}
-						
-						if(!is_scalar($Email)) {
-							switch($e) {
-								case 0:
-									$properties["email_address_1"] = $Email['Value'];
-									$properties["email_address_display_name_1"] = $fileas . " (" . $Email['Value'] . ")";
-									break;
-								case 1:
-									$properties["email_address_2"] = $Email['Value'];
-									$properties["email_address_display_name_2"] = $fileas . " (" . $Email['Value'] . ")";
-									break;
-								case 2:
-									$properties["email_address_3"] = $Email['Value'];
-									$properties["email_address_display_name_3"] = $fileas . " (" . $Email['Value'] . ")";
-									break;
-								default: break;
+
+						// we only have storage for 3 mail addresses!
+						switch($emailcount) {
+							case 0:
+								$properties["email_address_1"] = $email;
+								$properties["email_address_display_name_1"] = $fileas . " (" . $email . ")";
+								break;
+							case 1:
+								$properties["email_address_2"] = $email;
+								$properties["email_address_display_name_2"] = $fileas . " (" . $email . ")";
+								break;
+							case 2:
+								$properties["email_address_3"] = $email;
+								$properties["email_address_display_name_3"] = $fileas . " (" . $email . ")";
+								break;
+							default: break;
+						}
+						$emailcount++;
+					}
+				}
+				if (isset($vCard->organization)) {
+					$properties["company_name"] = $vCard->organization;
+					if(empty($properties["display_name"])) {
+						$properties["display_name"] = $vCard->organization; // if we have no displayname - use the company name as displayname
+						$properties["fileas"] = $vCard->organization;
+					}
+				}
+				if (isset($vCard->title)) {
+					$properties["title"] = $vCard->title;
+				}
+				if (isset($vCard->url) && count($vCard->url) > 0) {
+					foreach ($vCard->url as $type => $url) {
+						$url = $url[0]; // only 1 webaddress per type
+						$properties["webpage"] = $url;
+						break; // we can only store on url
+					}
+				}
+				if (isset($vCard->address) && count($vCard->address) > 0) {
+
+					foreach ($vCard->address as $type => $address) {
+						$address = $address[0]; // we only can store one address per type
+						if($this->startswith(strtolower($type), "work")) {
+							$properties["business_address_street"] = $address->street;
+							if(!empty($address->extended)) {
+								$properties["business_address_street"] .= "\n" . $address->extended;
 							}
-							$e++;
+							$properties["business_address_city"] = $address->city;
+							$properties["business_address_state"] = $address->region;
+							$properties["business_address_postal_code"] = $address->zip;
+							$properties["business_address_country"] = $address->country;
+							$properties["business_address"] = $this->buildAddressString($properties["business_address_street"], $address->zip, $address->city, $address->region, $address->country);
+						} else if($this->startswith(strtolower($type), "home")) {
+							$properties["home_address_street"] = $address->street;
+							if(!empty($address->extended)) {
+								$properties["home_address_street"] .= "\n" . $address->extended;
+							}
+							$properties["home_address_city"] = $address->city;
+							$properties["home_address_state"] = $address->region;
+							$properties["home_address_postal_code"] = $address->zip;
+							$properties["home_address_country"] = $address->country;
+							$properties["home_address"] = $this->buildAddressString($properties["home_address_street"], $address->zip, $address->city, $address->region, $address->country);
+						} else {
+							$properties["other_address_street"] = $address->street;
+							if(!empty($address->extended)) {
+								$properties["other_address_street"] .= "\n" . $address->extended;
+							}
+							$properties["other_address_city"] = $address->city;
+							$properties["other_address_state"] = $address->region;
+							$properties["other_address_postal_code"] = $address->zip;
+							$properties["other_address_country"] = $address->country;
+							$properties["other_address"] = $this->buildAddressString($properties["other_address_street"], $address->zip, $address->city, $address->region, $address->country);
 						}
 					}
 				}
-				if ($vCard -> ORG) {
-					foreach ($vCard -> ORG as $Organization) {
-						$properties["company_name"] = $Organization['Name'];
-						if(empty($properties["display_name"])) {
-							$properties["display_name"] = $Organization['Name']; // if we have no displayname - use the company name as displayname
-							$properties["fileas"] = $Organization['Name'];
-						}
-					}
+				if (isset($vCard->birthday)) {
+					$properties["birthday"] = $vCard->birthday->getTimestamp();
 				}
-				if ($vCard -> TITLE) {
-					$title = $vCard -> TITLE[0];
-					$properties["title"] = is_array($title) ? $title["Value"] : $title;
+				if (isset($vCard->note)) {
+					$properties["notes"] = $vCard->note;
 				}
-				if ($vCard -> URL) {
-					$url = $vCard -> URL[0]; // only 1 webaddress
-					$properties["webpage"] = is_array($url) ? $url["Value"] : $url;
-				}
-				if ($vCard -> IMPP) {
-					foreach ($vCard -> IMPP as $IMPP) {
-						if (!is_scalar($IMPP)) {
-							$properties["im"] = $IMPP['Value'];
-						}
-					}
-				}
-				if ($vCard -> ADR) {
-					foreach ($vCard -> ADR as $Address) {
-						if(in_array("work", $Address['Type'])) {
-							$properties["business_address_street"] = $Address['StreetAddress'];
-							$properties["business_address_city"] = $Address['Locality'];
-							$properties["business_address_state"] = $Address['Region'];
-							$properties["business_address_postal_code"] = $Address['PostalCode'];
-							$properties["business_address_country"] = $Address['Country'];
-							$properties["business_address"] = $this->buildAddressString($Address['StreetAddress'], $Address['PostalCode'], $Address['Locality'], $Address['Region'], $Address['Country']);
-						} else if(in_array("home", $Address['Type'])) {
-							$properties["home_address_street"] = $Address['StreetAddress'];
-							$properties["home_address_city"] = $Address['Locality'];
-							$properties["home_address_state"] = $Address['Region'];
-							$properties["home_address_postal_code"] = $Address['PostalCode'];
-							$properties["home_address_country"] = $Address['Country'];
-							$properties["home_address"] = $this->buildAddressString($Address['StreetAddress'], $Address['PostalCode'], $Address['Locality'], $Address['Region'], $Address['Country']);
-						} else if(in_array("postal", $Address['Type'])||in_array("parcel", $Address['Type'])||in_array("intl", $Address['Type'])||in_array("dom", $Address['Type'])) {
-							$properties["other_address_street"] = $Address['StreetAddress'];
-							$properties["other_address_city"] = $Address['Locality'];
-							$properties["other_address_state"] = $Address['Region'];
-							$properties["other_address_postal_code"] = $Address['PostalCode'];
-							$properties["other_address_country"] = $Address['Country'];
-							$properties["other_address"] = $this->buildAddressString($Address['StreetAddress'], $Address['PostalCode'], $Address['Locality'], $Address['Region'], $Address['Country']);
-						}
-					}
-				}
-				if ($vCard -> BDAY) {
-					$properties["birthday"] = strtotime($vCard -> BDAY[0]);
-				}
-				if ($vCard -> NOTE) {
-					$properties["notes"] = $vCard -> NOTE[0];
-				}
-				if ($vCard -> PHOTO) {
+				if (isset($vCard->rawPhoto) || isset($vCard->photo)) {
 					if(!is_writable(TMP_PATH . "/")) {
-						error_log("could not write to export tmp directory!: " . $E);
+						error_log("Can not write to export tmp directory!");
 					} else {
 						$tmppath = TMP_PATH . "/" . $this->randomstring(15);
-						try {
-							if($vCard -> SaveFile('photo', 0, $tmppath)) {
-								$properties["internal_fields"]["x_photo_path"] = $tmppath;								
-							} else {
-								if($this->DEBUG) {
-									error_log("remote imagefetching not implemented");
-								}
+						if(isset($vCard->rawPhoto)) {
+							if(file_put_contents($tmppath, $vCard->rawPhoto)) {
+								$properties["internal_fields"]["x_photo_path"] = $tmppath;
 							}
-						} catch (Exception $E) {
-							error_log("Image exception: " . $E);
+						} elseif(isset($vCard->photo)) {
+							if($this->startswith(strtolower($vCard->photo), "http://") || $this->startswith(strtolower($vCard->photo), "https://")) { // check if it starts with http
+								$ctx = stream_context_create(array('http'=>
+									array(
+										'timeout' => 3,  //3 Seconds timout
+									)
+								));
+
+								if(file_put_contents($tmppath, file_get_contents($vCard->photo, false, $ctx))) {
+									$properties["internal_fields"]["x_photo_path"] = $tmppath;
+								}
+							} else {
+								error_log("Invalid photo url: " . $vCard->photo);
+							}
 						}
 					}
 				}
@@ -814,6 +824,11 @@ class ContactModule extends Module {
 			$this->addActionData($actionType, $response);
 			$GLOBALS["bus"]->addData($this->getResponseData());
 		}
+	}
+
+	private function startswith($haystack, $needle) {
+		$haystack = str_replace("type=", "", $haystack); // remove type from string
+		return substr($haystack, 0, strlen($needle)) === $needle;
 	}
 };
 

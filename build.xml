@@ -135,6 +135,7 @@
 						<foreach target="syntax-check" param="file">
 							<path>
 								<fileset dir=".">
+									<exclude name="php/vendor/**" />
 									<include name="**/*.php"/>
 								</fileset>
 							</path>

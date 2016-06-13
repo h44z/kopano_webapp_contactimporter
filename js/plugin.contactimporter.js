@@ -83,16 +83,16 @@ Zarafa.plugins.contactimporter.ImportPlugin = Ext.extend(Zarafa.core.Plugin, {		
 	createAttachmentImportButton : function(include, btn) {
 		return {
 			text 		: _('Import Contacts'),
-			handler 	: this.getAttachmentFileName.createDelegate(this, [btn, this.gotAttachmentFileName]),
+			handler 	: this.getAttachmentFileName.createDelegate(this, [btn]),
 			scope		: this,
 			iconCls		: 'icon_contactimporter_button',
 			beforeShow 	: function(item, record) {
 				var extension = record.data.name.split('.').pop().toLowerCase();
 				
-				if(record.data.filetype  == "text/vcard" || extension == "vcf" || extension == "vcard") {
-					item.setVisible(false);
-				} else {
+				if(record.data.filetype  == "text/vcard" || record.data.filetype  == "text/x-vcard" || extension == "vcf" || extension == "vcard") {
 					item.setVisible(true);
+				} else {
+					item.setVisible(false);
 				}
 			}
 		};
@@ -117,7 +117,7 @@ Zarafa.plugins.contactimporter.ImportPlugin = Ext.extend(Zarafa.core.Plugin, {		
 	/**
 	 * Clickhandler for the button
 	 */
-	getAttachmentFileName: function (btn, callback) {
+	getAttachmentFileName: function (btn) {
 		Zarafa.common.dialogs.MessageBox.show({
 			title: 'Please wait',
 			msg: 'Loading attachment...',
@@ -157,7 +157,8 @@ Zarafa.plugins.contactimporter.ImportPlugin = Ext.extend(Zarafa.core.Plugin, {		
 		var filename = attachmentRecord.data.name;
 		
 		var responseHandler = new Zarafa.plugins.contactimporter.data.ResponseHandler({
-			successCallback: callback
+			successCallback: this.gotAttachmentFileName.createDelegate(this),
+			scope: this
 		});
 		
 		// request attachment preperation
