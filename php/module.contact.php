@@ -272,6 +272,12 @@ class ContactModule extends Module
 			$records = $actionData["records"];
 		}
 
+		// Get folders
+		$folder = false;
+		if (isset($actionData["folder"])) {
+			$folder = $actionData["folder"];
+		}
+
 		$response = array();
 		$error = false;
 		$error_msg = "";
@@ -283,6 +289,17 @@ class ContactModule extends Module
 
 		$store = $GLOBALS["mapisession"]->openMessageStore(hex2bin($storeid));
 		if ($store) {
+			// load folder first
+			if($folder !== false) {
+				$mapifolder = mapi_msgstore_openentry($store, hex2bin($folder));
+
+				$table = mapi_folder_getcontentstable($mapifolder);
+				$list = mapi_table_queryallrows($table, array(PR_ENTRYID));
+
+				foreach ($list as $item) {
+					$records[] = bin2hex($item[PR_ENTRYID]);
+				}
+			}
 			for ($index = 0, $count = count($records); $index < $count; $index++) {
 				// define vcard
 				$vcard = new VCard();
@@ -412,9 +429,14 @@ class ContactModule extends Module
 			return false;
 		}
 
-		$response['status'] = true;
-		$response['download_token'] = $token;
-		$response['filename'] = count($records) . "contacts.vcf";
+		if(count($records) > 0) {
+			$response['status'] = true;
+			$response['download_token'] = $token;
+			$response['filename'] = count($records) . "contacts.vcf";
+		} else {
+			$response['status'] = false;
+			$response['message'] = "No contacts found. Export skipped!";
+		}
 
 		$this->addActionData($actionType, $response);
 		$GLOBALS["bus"]->addData($this->getResponseData());

@@ -63,12 +63,18 @@ Zarafa.plugins.contactimporter.ImportPlugin = Ext.extend(Zarafa.core.Plugin, {		
 	 */
 	createImportButton: function () {
 		var button = {
-			xtype            : 'button',
-			text             : _('Import Contacts'),
-			iconCls          : 'icon_contactimporter_button',
+			xtype: 'panel',
+			cls: 'zarafa-ciplg-container',
+			layout: 'fit',
 			navigationContext: container.getContextByName('contact'),
-			handler          : this.onImportButtonClick,
-			scope            : this
+			items: [{
+				xtype            : 'button',
+				text             : _('Import Contacts'),
+				iconCls          : 'icon_contactimporter_button',
+				cls: 'zarafa-ciplg-button',
+				handler          : this.onImportButtonClick,
+				scope            : this
+			}]
 		};
 
 		return button;
@@ -119,19 +125,28 @@ Zarafa.plugins.contactimporter.ImportPlugin = Ext.extend(Zarafa.core.Plugin, {		
 	},
 
 	downloadVCF: function (response) {
-		var downloadFrame = Ext.getBody().createChild({
-			tag: 'iframe',
-			cls: 'x-hidden'
-		});
+		if(response.status == false) {
+			Zarafa.common.dialogs.MessageBox.show({
+				title  : dgettext('plugin_files', 'Warning'),
+				msg    : dgettext('plugin_files', response.message),
+				icon   : Zarafa.common.dialogs.MessageBox.WARNING,
+				buttons: Zarafa.common.dialogs.MessageBox.OK
+			});
+		} else {
+			var downloadFrame = Ext.getBody().createChild({
+				tag: 'iframe',
+				cls: 'x-hidden'
+			});
 
-		var url = document.URL;
-		var link = url.substring(0, url.lastIndexOf('/') + 1);
+			var url = document.URL;
+			var link = url.substring(0, url.lastIndexOf('/') + 1);
 
-		link += "index.php?sessionid=" + container.getUser().getSessionId() + "&load=custom&name=download_vcf";
-		link = Ext.urlAppend(link, "token=" + encodeURIComponent(response.download_token));
-		link = Ext.urlAppend(link, "filename=" + encodeURIComponent(response.filename));
+			link += "index.php?sessionid=" + container.getUser().getSessionId() + "&load=custom&name=download_vcf";
+			link = Ext.urlAppend(link, "token=" + encodeURIComponent(response.download_token));
+			link = Ext.urlAppend(link, "filename=" + encodeURIComponent(response.filename));
 
-		downloadFrame.dom.contentWindow.location = link;
+			downloadFrame.dom.contentWindow.location = link;
+		}
 	},
 
 	/**
@@ -271,6 +286,13 @@ Zarafa.plugins.contactimporter.ImportPlugin = Ext.extend(Zarafa.core.Plugin, {		
 			case Zarafa.core.data.SharedComponentType['plugins.contactimporter.dialogs.importcontacts']:
 				bid = 1;
 				break;
+			case Zarafa.core.data.SharedComponentType['common.contextmenu']:
+				if (record instanceof Zarafa.core.data.MAPIRecord) {
+					if (record.get('object_type') == Zarafa.core.mapi.ObjectType.MAPI_FOLDER) {
+						bid = 2;
+					}
+				}
+				break;
 		}
 		return bid;
 	},
@@ -287,6 +309,9 @@ Zarafa.plugins.contactimporter.ImportPlugin = Ext.extend(Zarafa.core.Plugin, {		
 		switch (type) {
 			case Zarafa.core.data.SharedComponentType['plugins.contactimporter.dialogs.importcontacts']:
 				component = Zarafa.plugins.contactimporter.dialogs.ImportContentPanel;
+				break;
+			case Zarafa.core.data.SharedComponentType['common.contextmenu']:
+				component = Zarafa.plugins.contactimporter.ui.ContextMenu;
 				break;
 		}
 

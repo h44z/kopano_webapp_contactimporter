@@ -28,6 +28,7 @@
 					<clientfile load="source">js/data/ResponseHandler.js</clientfile>
 					<clientfile load="source">js/dialogs/ImportContentPanel.js</clientfile>
 					<clientfile load="source">js/dialogs/ImportPanel.js</clientfile>
+					<clientfile load="source">js/ui/ContextMenu.js</clientfile>
 				</client>
 				<resources>
 					<resourcefile load="release">resources/css/contactimporter.css</resourcefile>
