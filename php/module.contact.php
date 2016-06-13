@@ -28,7 +28,7 @@ use JeroenDesloovere\VCard\VCardParser;
 
 class ContactModule extends Module {
 
-	private $DEBUG = false; 	// enable error_log debugging
+	private $DEBUG = true; 	// enable error_log debugging
 
 	/**
 	 * @constructor
@@ -244,6 +244,14 @@ class ContactModule extends Module {
 		$GLOBALS["bus"]->addData($this->getResponseData());
 	}
 
+	private function getProp($props, $propname) {
+		$p = $this->getProperties();
+		if(isset($props["props"][$propname])){
+			return $props["props"][$propname];
+		}
+		return "";
+	}
+
 	private function exportContacts($actionType, $actionData)
 	{
 		// Get store id
@@ -270,13 +278,129 @@ class ContactModule extends Module {
 		$store = $GLOBALS["mapisession"]->openMessageStore(hex2bin($storeid));
 		if ($store) {
 			for ($index = 0, $count = count($records); $index < $count; $index++) {
+				// define vcard
+				$vcard = new VCard();
+
 				$message = mapi_msgstore_openentry($store, hex2bin($records[$index]));
 
 				// get message properties.
-				$messageProps = mapi_getprops($message, array(PR_DISPLAY_NAME));
-				file_put_contents($file, file_get_contents($file) . $messageProps[PR_DISPLAY_NAME]);
+				$properties = $GLOBALS['properties']->getContactProperties();
+				$plaintext = true;
+				$messageProps = $GLOBALS['operations']->getMessageProps($store, $message, $properties, $plaintext);
 
-				// TODO: implement vcf
+				// define variables
+				$firstname = $this->getProp($messageProps, "given_name");
+				$lastname = $this->getProp($messageProps, "surname");
+				$additional = $this->getProp($messageProps, "middle_name");
+				$prefix = $this->getProp($messageProps, "display_name_prefix");
+				$suffix = '';
+
+				// add personal data
+				$vcard->addName($lastname, $firstname, $additional, $prefix, $suffix);
+
+				$company = $this->getProp($messageProps, "company_name");
+				if(!empty($company)) {
+					$vcard->addCompany($company);
+				}
+
+				$jobtitle = $this->getProp($messageProps, "title");
+				if(!empty($jobtitle)) {
+					$vcard->addJobtitle($jobtitle);
+				}
+
+				// MAIL
+				$mail = $this->getProp($messageProps, "email_address_1");
+				if(!empty($mail)) {
+					$vcard->addEmail($mail);
+				}
+				$mail = $this->getProp($messageProps, "email_address_2");
+				if(!empty($mail)) {
+					$vcard->addEmail($mail);
+				}
+				$mail = $this->getProp($messageProps, "email_address_3");
+				if(!empty($mail)) {
+					$vcard->addEmail($mail);
+				}
+
+				// PHONE
+				$wphone = $this->getProp($messageProps, "business_telephone_number");
+				if(!empty($wphone)) {
+					$vcard->addPhoneNumber($wphone, 'WORK');
+				}
+				$wphone = $this->getProp($messageProps, "home_telephone_number");
+				if(!empty($wphone)) {
+					$vcard->addPhoneNumber($wphone, 'HOME');
+				}
+				$wphone = $this->getProp($messageProps, "cellular_telephone_number");
+				if(!empty($wphone)) {
+					$vcard->addPhoneNumber($wphone, 'CELL');
+				}
+				$wphone = $this->getProp($messageProps, "business_fax_number");
+				if(!empty($wphone)) {
+					$vcard->addPhoneNumber($wphone, 'FAX');
+				}
+				$wphone = $this->getProp($messageProps, "pager_telephone_number");
+				if(!empty($wphone)) {
+					$vcard->addPhoneNumber($wphone, 'PAGER');
+				}
+				$wphone = $this->getProp($messageProps, "car_telephone_number");
+				if(!empty($wphone)) {
+					$vcard->addPhoneNumber($wphone, 'CAR');
+				}
+
+				// ADDRESS
+				$addr = $this->getProp($messageProps, "business_address");
+				if(!empty($addr)) {
+					$vcard->addAddress(null, null, $this->getProp($messageProps, "business_address_street"), $this->getProp($messageProps, "business_address_city"), $this->getProp($messageProps, "business_address_state"), $this->getProp($messageProps, "business_address_postal_code"), $this->getProp($messageProps, "business_address_country"), "WORK");
+				}
+				$addr = $this->getProp($messageProps, "home_address");
+				if(!empty($addr)) {
+					$vcard->addAddress(null, null, $this->getProp($messageProps, "home_address_street"), $this->getProp($messageProps, "home_address_city"), $this->getProp($messageProps, "home_address_state"), $this->getProp($messageProps, "home_address_postal_code"), $this->getProp($messageProps, "home_address_country"), "HOME");
+				}
+				$addr = $this->getProp($messageProps, "other_address");
+				if(!empty($addr)) {
+					$vcard->addAddress(null, null, $this->getProp($messageProps, "other_address_street"), $this->getProp($messageProps, "other_address_city"), $this->getProp($messageProps, "other_address_state"), $this->getProp($messageProps, "other_address_postal_code"), $this->getProp($messageProps, "other_address_country"), "OTHER");
+				}
+
+				// MISC
+				$url = $this->getProp($messageProps, "webpage");
+				if(!empty($url)) {
+					$vcard->addURL($url);
+				}
+
+				$bday = $this->getProp($messageProps, "birthday");
+				if(!empty($bday)) {
+					$vcard->addBirthday(date("Y-m-d", $bday));
+				}
+
+				$notes = $this->getProp($messageProps, "body");
+				if(!empty($notes)) {
+					$vcard->addNote($notes);
+				}
+
+				$haspicture = $this->getProp($messageProps, "has_picture");
+				if(!empty($haspicture) && $haspicture === true) {
+					$attachnum = -1;
+					if(isset($messageProps["attachments"]) && isset($messageProps["attachments"]["item"])) {
+						foreach($messageProps["attachments"]["item"] as $attachment) {
+							if($attachment["props"]["attachment_contactphoto"] == true) {
+								$attachnum = $attachment["props"]["attach_num"];
+								break;
+							}
+						}
+					}
+
+					if($attachnum >= 0) {
+						$attachment = $this->getAttachmentByAttachNum($message, $attachnum); // get first attachment only
+						$phototoken = $this->randomstring(16);
+						$tmpphoto = PLUGIN_CONTACTIMPORTER_TMP_UPLOAD . "photo_" . $phototoken . ".jpg";
+						$this->storeSavedAttachment($tmpphoto, $attachment);
+						$vcard->addPhoto($tmpphoto, true);
+						unlink($tmpphoto);
+					}
+				}
+				// write combined vcf
+				file_put_contents($file, file_get_contents($file) . $vcard->getOutput());
 			}
 		} else {
 			return false;
@@ -284,12 +408,49 @@ class ContactModule extends Module {
 
 		$response['status'] = true;
 		$response['download_token'] = $token;
-		$response['filename'] = "test.csv";
+		$response['filename'] = count($records)."contacts.vcf";
 
 		$this->addActionData($actionType, $response);
 		$GLOBALS["bus"]->addData($this->getResponseData());
 	}
 
+	/**
+	 * Returns attachment based on specified attachNum, additionally it will also get embedded message
+	 * if we want to get the inline image attachment.
+	 * @param $message
+	 * @param array $attachNum
+	 * @return MAPIAttach embedded message attachment or attachment that is requested
+	 */
+	private function getAttachmentByAttachNum($message, $attachNum)
+	{
+		// open the attachment
+		$attachment = mapi_message_openattach($message, $attachNum);
+
+		return $attachment;
+	}
+
+	/**
+	 * Function will open passed attachment and generate response for that attachment to send it to client.
+	 * This should only be used to download attachment that is already saved in MAPIMessage.
+	 * @param MAPIAttach $attachment attachment which will be dumped to client side
+	 * @return Response response to sent to client including attachment data
+	 */
+	private function storeSavedAttachment($temppath, $attachment) {
+		// Check if the attachment is opened
+		if($attachment) {
+			// Open a stream to get the attachment data
+			$stream = mapi_openproperty($attachment, PR_ATTACH_DATA_BIN, IID_IStream, 0, 0);
+			$stat = mapi_stream_stat($stream);
+
+			// Read the attachment content from the stream
+			$body = '';
+			for($i = 0; $i < $stat['cb']; $i += BLOCK_SIZE) {
+				$body .= mapi_stream_read($stream, BLOCK_SIZE);
+			}
+
+			file_put_contents($temppath, $body);
+		}
+	}
 
 	private function replaceStringPropertyTags($store, $properties) {
 		$newProperties = array();
