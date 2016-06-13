@@ -288,7 +288,7 @@ Zarafa.plugins.contactimporter.ImportPlugin = Ext.extend(Zarafa.core.Plugin, {		
 				break;
 			case Zarafa.core.data.SharedComponentType['common.contextmenu']:
 				if (record instanceof Zarafa.core.data.MAPIRecord) {
-					if (record.get('object_type') == Zarafa.core.mapi.ObjectType.MAPI_FOLDER) {
+					if (record.get('object_type') == Zarafa.core.mapi.ObjectType.MAPI_FOLDER && record.get('container_class') == "IPF.Contact") {
 						bid = 2;
 					}
 				}
