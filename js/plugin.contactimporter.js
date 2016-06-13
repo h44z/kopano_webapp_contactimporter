@@ -266,7 +266,8 @@ Zarafa.plugins.contactimporter.ImportPlugin = Ext.extend(Zarafa.core.Plugin, {		
 	openImportDialog: function (filename) {
 		var componentType = Zarafa.core.data.SharedComponentType['plugins.contactimporter.dialogs.importcontacts'];
 		var config = {
-			filename: filename
+			filename: filename,
+			modal: true
 		};
 
 		Zarafa.core.data.UIFactory.openLayerComponent(componentType, undefined, config);

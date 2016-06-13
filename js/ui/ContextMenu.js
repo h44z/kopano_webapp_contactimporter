@@ -43,7 +43,19 @@ Zarafa.plugins.contactimporter.ui.ContextMenu = Ext.extend(Zarafa.hierarchy.ui.C
 		return [{
 			xtype: 'menuseparator'
 		}, {
-			text : _('Export VCF'),
+			text : _('Import vCard'),
+			iconCls : 'icon_contactimporter_import',
+			handler : this.onContextItemImport,
+			beforeShow : function(item, record) {
+				var access = record.get('access') & Zarafa.core.mapi.Access.ACCESS_MODIFY;
+				if (!access || (record.isIPMSubTree() && !record.getMAPIStore().isDefaultStore())) {
+					item.setDisabled(true);
+				} else {
+					item.setDisabled(false);
+				}
+			}
+		}, {
+			text : _('Export vCard'),
 			iconCls : 'icon_contactimporter_export',
 			handler : this.onContextItemExport,
 			beforeShow : function(item, record) {
@@ -58,7 +70,7 @@ Zarafa.plugins.contactimporter.ui.ContextMenu = Ext.extend(Zarafa.hierarchy.ui.C
 	},
 
 	/**
-	 * Fires on selecting 'Open' menu option from {@link Zarafa.hierarchy.ui.ContextMenu ContextMenu}
+	 * Fires on selecting 'Open' menu option from {@link Zarafa.plugins.contactimporter.ui.ContextMenu ContextMenu}
 	 * @private
 	 */
 	onContextItemExport: function () {
@@ -77,6 +89,20 @@ Zarafa.plugins.contactimporter.ui.ContextMenu = Ext.extend(Zarafa.hierarchy.ui.C
 			},
 			responseHandler
 		);
+	},
+
+	/**
+	 * Fires on selecting 'Open' menu option from {@link Zarafa.plugins.contactimporter.ui.ContextMenu ContextMenu}
+	 * @private
+	 */
+	onContextItemImport: function () {
+		var componentType = Zarafa.core.data.SharedComponentType['plugins.contactimporter.dialogs.importcontacts'];
+		var config = {
+			modal: true,
+			folder: this.records.get("entryid")
+		};
+
+		Zarafa.core.data.UIFactory.openLayerComponent(componentType, undefined, config);
 	},
 
 	downloadVCF: function (response) {

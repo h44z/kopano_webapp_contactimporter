@@ -11,12 +11,18 @@
     background-position: center;
 }
 
+.icon_contactimporter_import {
+    background: url(../images/upload.png) no-repeat;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
 .zarafa-ciplg-container {
     width: 100%;
     height: 30px;
 }
 
-.zarafa-ciplg-button.x-btn-small {
+.zarafa-ciplg-button .x-btn-small {
     width: 80%;
     height: 25px;
     margin-left: auto;

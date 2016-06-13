@@ -39,6 +39,9 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 	/* The store for the selection grid */
 	store  : null,
 
+	/* selected folder */
+	folder : null,
+
 	/**
 	 * @constructor
 	 * @param {object} config
@@ -49,6 +52,10 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 
 		if (!Ext.isEmpty(config.filename)) {
 			this.vcffile = config.filename;
+		}
+
+		if (!Ext.isEmpty(config.folder)) {
+			this.folder = config.folder;
 		}
 
 		// create the data store
@@ -224,7 +231,7 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 			name          : "choosen_addressbook",
 			value         : container.getSettingsModel().get("zarafa/v1/plugins/contactimporter/default_addressbook"),
 			width         : 100,
-			fieldLabel    : "Select an addressbook",
+			fieldLabel    : "Select folder",
 			store         : myStore,
 			mode          : 'local',
 			labelSeperator: ":",
@@ -245,6 +252,7 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 			emptyText  : 'Select an .vcf addressbook',
 			border     : false,
 			anchor     : "100%",
+			height     : "30",
 			scope      : this,
 			allowBlank : false,
 			listeners  : {
