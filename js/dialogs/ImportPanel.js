@@ -132,14 +132,87 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 		};
 	},
 
-	getAllContactFolders: function() {
+	getAllContactFolders: function(asDropdownStore) {
+		asDropdownStore = Ext.isEmpty(asDropdownStore) ? false : asDropdownStore;
+
 		var allFolders = [];
 
-		/**
-		 * TODO:
-		 * container.getHierarchyStore() -> 2 stores: inbux und public
-		 * inbox -> substores -> alle folder!
-		 */
+		var defaultContactFolder = container.getHierarchyStore().getDefaultFolder('contact');
+
+		var inbox = container.getHierarchyStore().getDefaultStore();
+		var pub = container.getHierarchyStore().getPublicStore();
+
+		if(!Ext.isEmpty(inbox.subStores) && inbox.subStores.folders.totalLength > 0) {
+			for(var i=0; i < inbox.subStores.folders.totalLength; i++) {
+				var folder = inbox.subStores.folders.getAt(i);
+				if(folder.get("container_class") == "IPF.Contact") {
+					if(asDropdownStore) {
+						allFolders.push([
+							folder.get("entryid"),
+							folder.get("display_name")
+						]);
+					} else {
+						allFolders.push({
+							display_name : folder.get("display_name"),
+							entryid      : folder.get("entryid"),
+							store_entryid: folder.get("store_entryid"),
+							is_public    : false
+						});
+					}
+				}
+			}
+		}
+
+		if(!Ext.isEmpty(pub.subStores) && pub.subStores.folders.totalLength > 0) {
+			for(var j=0; j < pub.subStores.folders.totalLength; j++) {
+				var folder = pub.subStores.folders.getAt(j);
+				if(folder.get("container_class") == "IPF.Contact") {
+					if(asDropdownStore) {
+						allFolders.push([
+							folder.get("entryid"),
+							folder.get("display_name") + " (Public)"
+						]);
+					} else {
+						allFolders.push({
+							display_name : folder.get("display_name"),
+							entryid      : folder.get("entryid"),
+							store_entryid: folder.get("store_entryid"),
+							is_public    : true
+						});
+					}
+				}
+			}
+		}
+
+		if(asDropdownStore) {
+			return allFolders.sort(this.dynamicSort(1));
+		} else {
+			return allFolders;
+		}
+	},
+
+	dynamicSort: function(property) {
+		var sortOrder = 1;
+		if(property[0] === "-") {
+			sortOrder = -1;
+			property = property.substr(1);
+		}
+		return function (a,b) {
+			var result = (a[property].toLowerCase() < b[property].toLowerCase()) ? -1 : (a[property].toLowerCase() > b[property].toLowerCase()) ? 1 : 0;
+			return result * sortOrder;
+		}
+	},
+
+	getContactFolderByName: function(name) {
+		var folders = this.getAllContactFolders(false);
+
+		for(var i=0; i<folders.length; i++) {
+			if(folders[i].display_name == name) {
+				return folders[i];
+			}
+		}
+
+		return container.getHierarchyStore().getDefaultFolder('contact');
 	},
 
 	/**
@@ -204,42 +277,14 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 	},
 
 	createSelectBox: function () {
-		var defaultFolder = container.getHierarchyStore().getDefaultFolder('contact'); // @type: Zarafa.hierarchy.data.MAPIFolderRecord
-		var subFolders = defaultFolder.getChildren();
-		var myStore = [];
-
-		/* add all local contact folders */
-		var i = 0;
-		myStore.push([defaultFolder.getDefaultFolderKey(), defaultFolder.getDisplayName()]);
-		for (i = 0; i < subFolders.length; i++) {
-			/* Store all subfolders */
-			myStore.push([subFolders[i].getDisplayName(), subFolders[i].getDisplayName(), false]); // 3rd field = isPublicfolder
-		}
-
-		/* add all shared contact folders */
-		var pubStore = container.getHierarchyStore().getPublicStore();
-
-		if (typeof pubStore !== "undefined") {
-			try {
-				var pubFolder = pubStore.getDefaultFolder("publicfolders");
-				var pubSubFolders = pubFolder.getChildren();
-				for (i = 0; i < pubSubFolders.length; i++) {
-					if (pubSubFolders[i].isContainerClass("IPF.Contact")) {
-						myStore.push([pubSubFolders[i].getDisplayName(), pubSubFolders[i].getDisplayName() + " [Shared]", true]); // 3rd field = isPublicfolder
-					}
-				}
-			} catch (e) {
-				console.log("Error opening the shared folder...");
-				console.log(e);
-			}
-		}
+		var myStore = this.getAllContactFolders(true);
 
 		return {
 			xtype         : "selectbox",
 			ref           : 'addressbookSelector',
 			editable      : false,
 			name          : "choosen_addressbook",
-			value         : container.getSettingsModel().get("zarafa/v1/plugins/contactimporter/default_addressbook"),
+			value         : Ext.isEmpty(this.folder) ? this.getContactFolderByName(container.getSettingsModel().get("zarafa/v1/plugins/contactimporter/default_addressbook")).entryid : this.folder,
 			width         : 100,
 			fieldLabel    : "Select folder",
 			store         : myStore,
@@ -248,6 +293,7 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 			border        : false,
 			anchor        : "100%",
 			scope         : this,
+			hidden        : Ext.isEmpty(this.folder) ? false : true,
 			allowBlank    : false
 		}
 	},
