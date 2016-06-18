@@ -1,4 +1,5 @@
 <?php
+
 /**
  * download.php, zarafa contact to vcf im/exporter
  *
@@ -22,7 +23,10 @@
  */
 class DownloadHandler
 {
-
+	/**
+	 * Download the given vcf file.
+	 * @return bool
+	 */
 	public static function doDownload()
 	{
 		if (isset($_GET["token"])) {

@@ -11,8 +11,7 @@ Zarafa.plugins.contactimporter.ui.ContextMenu = Ext.extend(Zarafa.hierarchy.ui.C
 	 * @constructor
 	 * @param {Object} config Configuration object
 	 */
-	constructor : function(config)
-	{
+	constructor: function (config) {
 		config = config || {};
 
 		if (config.contextNode) {
@@ -23,7 +22,7 @@ Zarafa.plugins.contactimporter.ui.ContextMenu = Ext.extend(Zarafa.hierarchy.ui.C
 
 		// add item to menu
 		var additionalItems = this.createAdditionalContextMenuItems(config);
-		for(var i=0; i <additionalItems.length; i++) {
+		for (var i = 0; i < additionalItems.length; i++) {
 			config.items[0].push(additionalItems[i]);
 		}
 
@@ -38,15 +37,14 @@ Zarafa.plugins.contactimporter.ui.ContextMenu = Ext.extend(Zarafa.hierarchy.ui.C
 	 *
 	 * Note: All handlers are called within the scope of {@link Zarafa.plugins.contactimporter.ui.ContextMenu HierarchyContextMenu}
 	 */
-	createAdditionalContextMenuItems : function(config)
-	{
+	createAdditionalContextMenuItems: function (config) {
 		return [{
 			xtype: 'menuseparator'
 		}, {
-			text : _('Import vCard'),
-			iconCls : 'icon_contactimporter_import',
-			handler : this.onContextItemImport,
-			beforeShow : function(item, record) {
+			text      : _('Import vCard'),
+			iconCls   : 'icon_contactimporter_import',
+			handler   : this.onContextItemImport,
+			beforeShow: function (item, record) {
 				var access = record.get('access') & Zarafa.core.mapi.Access.ACCESS_MODIFY;
 				if (!access || (record.isIPMSubTree() && !record.getMAPIStore().isDefaultStore())) {
 					item.setDisabled(true);
@@ -55,10 +53,10 @@ Zarafa.plugins.contactimporter.ui.ContextMenu = Ext.extend(Zarafa.hierarchy.ui.C
 				}
 			}
 		}, {
-			text : _('Export vCard'),
-			iconCls : 'icon_contactimporter_export',
-			handler : this.onContextItemExport,
-			beforeShow : function(item, record) {
+			text      : _('Export vCard'),
+			iconCls   : 'icon_contactimporter_export',
+			handler   : this.onContextItemExport,
+			beforeShow: function (item, record) {
 				var access = record.get('access') & Zarafa.core.mapi.Access.ACCESS_READ;
 				if (!access || (record.isIPMSubTree() && !record.getMAPIStore().isDefaultStore())) {
 					item.setDisabled(true);
@@ -85,7 +83,7 @@ Zarafa.plugins.contactimporter.ui.ContextMenu = Ext.extend(Zarafa.hierarchy.ui.C
 			'export',
 			{
 				storeid: this.records.get("store_entryid"),
-				folder: this.records.get("entryid")
+				folder : this.records.get("entryid")
 			},
 			responseHandler
 		);
@@ -98,15 +96,19 @@ Zarafa.plugins.contactimporter.ui.ContextMenu = Ext.extend(Zarafa.hierarchy.ui.C
 	onContextItemImport: function () {
 		var componentType = Zarafa.core.data.SharedComponentType['plugins.contactimporter.dialogs.importcontacts'];
 		var config = {
-			modal: true,
+			modal : true,
 			folder: this.records.get("entryid")
 		};
 
 		Zarafa.core.data.UIFactory.openLayerComponent(componentType, undefined, config);
 	},
 
+	/**
+	 * Callback for the export request.
+	 * @param {Object} response
+	 */
 	downloadVCF: function (response) {
-		if(response.status == false) {
+		if (response.status == false) {
 			Zarafa.common.dialogs.MessageBox.show({
 				title  : dgettext('plugin_files', 'Warning'),
 				msg    : dgettext('plugin_files', response.message),

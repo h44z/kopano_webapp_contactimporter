@@ -29,7 +29,7 @@ use JeroenDesloovere\VCard\VCardParser;
 class ContactModule extends Module
 {
 
-	private $DEBUG = true;    // enable error_log debugging
+	private $DEBUG = false;    // enable error_log debugging
 
 	/**
 	 * @constructor
@@ -249,6 +249,12 @@ class ContactModule extends Module
 		$GLOBALS["bus"]->addData($this->getResponseData());
 	}
 
+	/**
+	 * Get a property from the array.
+	 * @param $props
+	 * @param $propname
+	 * @return string
+	 */
 	private function getProp($props, $propname)
 	{
 		$p = $this->getProperties();
@@ -258,6 +264,12 @@ class ContactModule extends Module
 		return "";
 	}
 
+	/**
+	 * Export selected contacts to vCard.
+	 * @param $actionType
+	 * @param $actionData
+	 * @return bool
+	 */
 	private function exportContacts($actionType, $actionData)
 	{
 		// Get store id
@@ -290,7 +302,7 @@ class ContactModule extends Module
 		$store = $GLOBALS["mapisession"]->openMessageStore(hex2bin($storeid));
 		if ($store) {
 			// load folder first
-			if($folder !== false) {
+			if ($folder !== false) {
 				$mapifolder = mapi_msgstore_openentry($store, hex2bin($folder));
 
 				$table = mapi_folder_getcontentstable($mapifolder);
@@ -429,7 +441,7 @@ class ContactModule extends Module
 			return false;
 		}
 
-		if(count($records) > 0) {
+		if (count($records) > 0) {
 			$response['status'] = true;
 			$response['download_token'] = $token;
 			$response['filename'] = count($records) . "contacts.vcf";
@@ -481,6 +493,12 @@ class ContactModule extends Module
 		}
 	}
 
+	/**
+	 * Replace String Property Tags
+	 * @param $store
+	 * @param $properties
+	 * @return array
+	 */
 	private function replaceStringPropertyTags($store, $properties)
 	{
 		$newProperties = array();
@@ -1131,6 +1149,12 @@ class ContactModule extends Module
 		}
 	}
 
+	/**
+	 * Check if string starts with other string.
+	 * @param $haystack
+	 * @param $needle
+	 * @return bool
+	 */
 	private function startswith($haystack, $needle)
 	{
 		$haystack = str_replace("type=", "", $haystack); // remove type from string

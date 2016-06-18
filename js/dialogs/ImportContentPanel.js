@@ -54,7 +54,7 @@ Zarafa.plugins.contactimporter.dialogs.ImportContentPanel = Ext.extend(Zarafa.co
 				{
 					xtype   : 'contactimporter.importcontactpanel',
 					filename: config.filename,
-					folder: config.folder
+					folder  : config.folder
 				}
 			]
 		});

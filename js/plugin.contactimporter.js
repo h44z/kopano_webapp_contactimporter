@@ -68,6 +68,10 @@ Zarafa.plugins.contactimporter.ImportPlugin = Ext.extend(Zarafa.core.Plugin, {		
 		};
 	},
 
+	/**
+	 * Generates a request to download the selected records as vCard.
+	 * @param {Ext.Button} btn
+	 */
 	exportToVCF: function (btn) {
 		if (btn.records.length == 0) {
 			return; // skip if no records where given!
@@ -96,8 +100,12 @@ Zarafa.plugins.contactimporter.ImportPlugin = Ext.extend(Zarafa.core.Plugin, {		
 		);
 	},
 
+	/**
+	 * Callback for the export request.
+	 * @param {Object} response
+	 */
 	downloadVCF: function (response) {
-		if(response.status == false) {
+		if (response.status == false) {
 			Zarafa.common.dialogs.MessageBox.show({
 				title  : dgettext('plugin_files', 'Warning'),
 				msg    : dgettext('plugin_files', response.message),
@@ -146,6 +154,7 @@ Zarafa.plugins.contactimporter.ImportPlugin = Ext.extend(Zarafa.core.Plugin, {		
 
 	/**
 	 * Callback for getAttachmentFileName
+	 * @param {Object} response
 	 */
 	gotAttachmentFileName: function (response) {
 		if (response.status == true) {
@@ -162,6 +171,7 @@ Zarafa.plugins.contactimporter.ImportPlugin = Ext.extend(Zarafa.core.Plugin, {		
 
 	/**
 	 * Clickhandler for the button
+	 * @param {Ext.Button} btn
 	 */
 	getAttachmentFileName: function (btn) {
 		Zarafa.common.dialogs.MessageBox.show({
@@ -225,14 +235,13 @@ Zarafa.plugins.contactimporter.ImportPlugin = Ext.extend(Zarafa.core.Plugin, {		
 
 	/**
 	 * Open the import dialog.
-	 *
 	 * @param {String} filename
 	 */
 	openImportDialog: function (filename) {
 		var componentType = Zarafa.core.data.SharedComponentType['plugins.contactimporter.dialogs.importcontacts'];
 		var config = {
 			filename: filename,
-			modal: true
+			modal   : true
 		};
 
 		Zarafa.core.data.UIFactory.openLayerComponent(componentType, undefined, config);

@@ -29,7 +29,7 @@ Ext.namespace("Zarafa.plugins.contactimporter.dialogs");
 
 /**
  * @class Zarafa.plugins.contactimporter.dialogs.ImportPanel
- * @extends Ext.form.FormPanel
+ * @extends Ext.Panel
  */
 Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 
@@ -132,7 +132,12 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 		};
 	},
 
-	getAllContactFolders: function(asDropdownStore) {
+	/**
+	 * Get all contact folders.
+	 * @param {boolean} asDropdownStore If true, a simple array store will be returned.
+	 * @returns {*}
+	 */
+	getAllContactFolders: function (asDropdownStore) {
 		asDropdownStore = Ext.isEmpty(asDropdownStore) ? false : asDropdownStore;
 
 		var allFolders = [];
@@ -142,11 +147,11 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 		var inbox = container.getHierarchyStore().getDefaultStore();
 		var pub = container.getHierarchyStore().getPublicStore();
 
-		if(!Ext.isEmpty(inbox.subStores) && inbox.subStores.folders.totalLength > 0) {
-			for(var i=0; i < inbox.subStores.folders.totalLength; i++) {
+		if (!Ext.isEmpty(inbox.subStores) && inbox.subStores.folders.totalLength > 0) {
+			for (var i = 0; i < inbox.subStores.folders.totalLength; i++) {
 				var folder = inbox.subStores.folders.getAt(i);
-				if(folder.get("container_class") == "IPF.Contact") {
-					if(asDropdownStore) {
+				if (folder.get("container_class") == "IPF.Contact") {
+					if (asDropdownStore) {
 						allFolders.push([
 							folder.get("entryid"),
 							folder.get("display_name")
@@ -163,11 +168,11 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 			}
 		}
 
-		if(!Ext.isEmpty(pub.subStores) && pub.subStores.folders.totalLength > 0) {
-			for(var j=0; j < pub.subStores.folders.totalLength; j++) {
+		if (!Ext.isEmpty(pub.subStores) && pub.subStores.folders.totalLength > 0) {
+			for (var j = 0; j < pub.subStores.folders.totalLength; j++) {
 				var folder = pub.subStores.folders.getAt(j);
-				if(folder.get("container_class") == "IPF.Contact") {
-					if(asDropdownStore) {
+				if (folder.get("container_class") == "IPF.Contact") {
+					if (asDropdownStore) {
 						allFolders.push([
 							folder.get("entryid"),
 							folder.get("display_name") + " (Public)"
@@ -184,30 +189,40 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 			}
 		}
 
-		if(asDropdownStore) {
+		if (asDropdownStore) {
 			return allFolders.sort(this.dynamicSort(1));
 		} else {
 			return allFolders;
 		}
 	},
 
-	dynamicSort: function(property) {
+	/**
+	 * Dynamic sort function, sorts by property name.
+	 * @param {string|int} property
+	 * @returns {Function}
+	 */
+	dynamicSort: function (property) {
 		var sortOrder = 1;
-		if(property[0] === "-") {
+		if (property[0] === "-") {
 			sortOrder = -1;
 			property = property.substr(1);
 		}
-		return function (a,b) {
+		return function (a, b) {
 			var result = (a[property].toLowerCase() < b[property].toLowerCase()) ? -1 : (a[property].toLowerCase() > b[property].toLowerCase()) ? 1 : 0;
 			return result * sortOrder;
 		}
 	},
 
-	getContactFolderByName: function(name) {
+	/**
+	 * Return a contact folder element by name.
+	 * @param {string} name
+	 * @returns {*}
+	 */
+	getContactFolderByName: function (name) {
 		var folders = this.getAllContactFolders(false);
 
-		for(var i=0; i<folders.length; i++) {
-			if(folders[i].display_name == name) {
+		for (var i = 0; i < folders.length; i++) {
+			if (folders[i].display_name == name) {
 				return folders[i];
 			}
 		}
@@ -276,6 +291,10 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 		}
 	},
 
+	/**
+	 * Generate the UI calendar select box.
+	 * @returns {*}
+	 */
 	createSelectBox: function () {
 		var myStore = this.getAllContactFolders(true);
 
@@ -298,6 +317,10 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 		}
 	},
 
+	/**
+	 * Generate the UI upload field.
+	 * @returns {*}
+	 */
 	createUploadField: function () {
 		return {
 			xtype      : "fileuploadfield",
@@ -318,6 +341,10 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 		}
 	},
 
+	/**
+	 * Generate the UI submit button.
+	 * @returns {*}
+	 */
 	createSubmitButton: function () {
 		return {
 			xtype     : "button",
@@ -333,6 +360,10 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 		}
 	},
 
+	/**
+	 * Generate the UI submit all button.
+	 * @returns {*}
+	 */
 	createSubmitAllButton: function () {
 		return {
 			xtype     : "button",
@@ -348,6 +379,10 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 		}
 	},
 
+	/**
+	 * Generate the UI cancel button.
+	 * @returns {*}
+	 */
 	createCancelButton: function () {
 		return {
 			xtype     : "button",
@@ -394,6 +429,10 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 		}
 	},
 
+	/**
+	 * Start request to server to parse the given vCard file.
+	 * @param {string} vcfPath
+	 */
 	parseContacts: function (vcfPath) {
 		this.loadMask.show();
 
@@ -412,6 +451,10 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 		);
 	},
 
+	/**
+	 * Callback for the parsing request.
+	 * @param {Object} response
+	 */
 	handleParsingResult: function (response) {
 		this.loadMask.hide();
 
@@ -432,16 +475,25 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 		}
 	},
 
+	/**
+	 * Close the UI dialog.
+	 */
 	close: function () {
 		this.addContactFormPanel.getForm().reset();
 		this.dialog.close()
 	},
 
+	/**
+	 * Create a request to import all selected contacts.
+	 */
 	importCheckedContacts: function () {
 		var newRecords = this.contactGrid.selModel.getSelections();
 		this.importContacts(newRecords);
 	},
 
+	/**
+	 * Check all contacts and import them.
+	 */
 	importAllContacts: function () {
 		//receive Records from grid rows
 		this.contactGrid.selModel.selectAll();  // select all entries
@@ -450,8 +502,8 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 	},
 
 	/**
-	 * This function stores all given events to the appointmentstore
-	 * @param events
+	 * This function stores all given events to the contact store
+	 * @param {array} contacts
 	 */
 	importContacts: function (contacts) {
 		//receive existing contact store
@@ -540,6 +592,10 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 		}
 	},
 
+	/**
+	 * Callback for the import request.
+	 * @param {Object} response
+	 */
 	importContactsDone: function (response) {
 		this.loadMask.hide();
 		this.dialog.close();
