@@ -231,6 +231,23 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 	},
 
 	/**
+	 * Return a contact folder element by entryid.
+	 * @param {string} entryid
+	 * @returns {*}
+	 */
+	getContactFolderByEntryid: function (entryid) {
+		var folders = this.getAllContactFolders(false);
+
+		for (var i = 0; i < folders.length; i++) {
+			if (folders[i].entryid == entryid) {
+				return folders[i];
+			}
+		}
+
+		return container.getHierarchyStore().getDefaultFolder('contact');
+	},
+
+	/**
 	 * Reloads the data of the grid
 	 * @private
 	 */
@@ -517,7 +534,6 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 				buttons: Zarafa.common.dialogs.MessageBox.OK
 			});
 		} else {
-			var addressbookexist = true;
 			if (this.contactGrid.selModel.getCount() < 1) {
 				Zarafa.common.dialogs.MessageBox.show({
 					title  : _('Error'),
@@ -526,68 +542,31 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
 					buttons: Zarafa.common.dialogs.MessageBox.OK
 				});
 			} else {
-				var contactStore = new Zarafa.contact.ContactStore();
-				var contactFolder = container.getHierarchyStore().getDefaultFolder('contact');
-				var pubStore = container.getHierarchyStore().getPublicStore();
-				var pubFolder = pubStore.getDefaultFolder("publicfolders");
-				var pubSubFolders = pubFolder.getChildren();
+				var contactFolder = this.getContactFolderByEntryid(folderValue);
 
-				if (folderValue != "contact") {
-					var subFolders = contactFolder.getChildren();
-					var i = 0;
-					for (i = 0; i < pubSubFolders.length; i++) {
-						if (pubSubFolders[i].isContainerClass("IPF.Contact")) {
-							subFolders.push(pubSubFolders[i]);
-						}
-					}
-					for (i = 0; i < subFolders.length; i++) {
-						// look up right folder 
-						// TODO: improve!!
-						if (subFolders[i].getDisplayName() == folderValue) {
-							contactFolder = subFolders[i];
-							break;
-						}
-					}
+				this.loadMask.show();
+				var uids = [];
 
-					if (contactFolder.isDefaultFolder()) {
-						Zarafa.common.dialogs.MessageBox.show({
-							title  : _('Error'),
-							msg    : _('Selected addressbook does not exist!'),
-							icon   : Zarafa.common.dialogs.MessageBox.ERROR,
-							buttons: Zarafa.common.dialogs.MessageBox.OK
-						});
-						addressbookexist = false;
-					}
-				}
+				//receive Records from grid rows
+				Ext.each(contacts, function (newRecord) {
+					uids.push(newRecord.data.record.internal_fields.contact_uid);
+				}, this);
 
-				if (addressbookexist) {
-					this.loadMask.show();
-					var uids = [];
-					var store_entryid = "";
+				var responseHandler = new Zarafa.plugins.contactimporter.data.ResponseHandler({
+					successCallback: this.importContactsDone.createDelegate(this)
+				});
 
-					//receive Records from grid rows
-					Ext.each(contacts, function (newRecord) {
-						uids.push(newRecord.data.record.internal_fields.contact_uid);
-					}, this);
-					store_entryid = contactFolder.get('store_entryid');
-
-					var responseHandler = new Zarafa.plugins.contactimporter.data.ResponseHandler({
-						successCallback: this.importContactsDone.createDelegate(this)
-					});
-
-					container.getRequest().singleRequest(
-						'contactmodule',
-						'import',
-						{
-							storeid     : contactFolder.get("store_entryid"),
-							folderid    : contactFolder.get("entryid"),
-							uids        : uids,
-							vcf_filepath: this.vcffile
-						},
-						responseHandler
-					);
-
-				}
+				container.getRequest().singleRequest(
+					'contactmodule',
+					'import',
+					{
+						storeid     : contactFolder.store_entryid,
+						folderid    : contactFolder.entryid,
+						uids        : uids,
+						vcf_filepath: this.vcffile
+					},
+					responseHandler
+				);
 			}
 		}
 	},
