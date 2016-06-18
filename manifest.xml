@@ -2,7 +2,7 @@
 <!DOCTYPE plugin SYSTEM "manifest.dtd">
 <plugin version="2">
 	<info>
-		<version>@_@PLUGIN_VERSION@_@</version>
+		<version>2.0.0</version>
 		<name>contactimporter</name>
 		<title>VCF Contact Importer/Exporter</title>
 		<author>Christoph Haas</author>
@@ -20,16 +20,18 @@
 					<serverfile type="module" module="contactmodule">php/module.contact.php</serverfile>
 				</server>
 				<client>
-					<clientfile load="release">js/contactimporter.js</clientfile>
+					<clientfile load="release">js/contactimporter-debug.js</clientfile>
 					<clientfile load="debug">js/contactimporter-debug.js</clientfile>
-					
+
 					<clientfile load="source">js/plugin.contactimporter.js</clientfile>
+					<clientfile load="source">js/ABOUT.js</clientfile>
 					<clientfile load="source">js/data/ResponseHandler.js</clientfile>
 					<clientfile load="source">js/dialogs/ImportContentPanel.js</clientfile>
 					<clientfile load="source">js/dialogs/ImportPanel.js</clientfile>
+					<clientfile load="source">js/ui/ContextMenu.js</clientfile>
 				</client>
 				<resources>
-					<resourcefile load="release">resources/css/contactimporter-min.css</resourcefile>
+					<resourcefile load="release">resources/css/contactimporter.css</resourcefile>
 					<resourcefile load="debug">resources/css/contactimporter.css</resourcefile>
 					<resourcefile load="source">resources/css/contactimporter-main.css</resourcefile>
 				</resources>

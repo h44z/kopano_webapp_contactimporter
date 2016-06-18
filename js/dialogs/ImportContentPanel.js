@@ -2,7 +2,7 @@
  * ImportContentPanel.js zarafa contact to vcf im/exporter
  *
  * Author: Christoph Haas <christoph.h@sprinternet.at>
- * Copyright (C) 2012-2013 Christoph Haas
+ * Copyright (C) 2012-2016 Christoph Haas
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,13 +19,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
- 
+
 /**
  * ImportContentPanel
  *
  * Container for the importpanel.
  */
-Ext.namespace("Zarafa.plugins.contactimporter.dialogs"); 
+Ext.namespace("Zarafa.plugins.contactimporter.dialogs");
 
 /**
  * @class Zarafa.plugins.contactimporter.dialogs.ImportContentPanel
@@ -40,23 +40,21 @@ Zarafa.plugins.contactimporter.dialogs.ImportContentPanel = Ext.extend(Zarafa.co
 	 * @constructor
 	 * @param config Configuration structure
 	 */
-	constructor : function(config) {
+	constructor: function (config) {
 		config = config || {};
 		var title = _('Import Contacts');
-		if(container.getSettingsModel().get("zarafa/v1/plugins/contactimporter/enable_export")){
-			title = _('Import/Export Contacts');
-		}
 		Ext.applyIf(config, {
-			layout		: 'fit',
-			title		: title,
-			closeOnSave	: true,
-			width		: 620,
-			height		: 465,
+			layout     : 'fit',
+			title      : title,
+			closeOnSave: true,
+			width      : 620,
+			height     : 465,
 			//Add panel
-			items : [
+			items      : [
 				{
-					xtype	 : 'contactimporter.importcontactpanel',
-					filename : config.filename 
+					xtype   : 'contactimporter.importcontactpanel',
+					filename: config.filename,
+					folder  : config.folder
 				}
 			]
 		});
@@ -66,4 +64,4 @@ Zarafa.plugins.contactimporter.dialogs.ImportContentPanel = Ext.extend(Zarafa.co
 
 });
 
-Ext.reg('contactimporter.contentpanel' ,Zarafa.plugins.contactimporter.dialogs.ImportContentPanel);
+Ext.reg('contactimporter.contentpanel', Zarafa.plugins.contactimporter.dialogs.ImportContentPanel);

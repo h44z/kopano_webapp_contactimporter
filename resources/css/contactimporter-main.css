@@ -1,6 +1,30 @@
 .icon_contactimporter_button {
-	background: url(../images/import_icon.png) no-repeat !important;
-	background-repeat: no-repeat;
-	background-position: center;
-	background-size: 18px!important;
+    background: url(../images/import_icon.png) no-repeat !important;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.icon_contactimporter_export {
+    background: url(../images/download.png) no-repeat;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.icon_contactimporter_import {
+    background: url(../images/upload.png) no-repeat;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.zarafa-ciplg-container {
+    width: 100%;
+    height: 50px;
+}
+
+.zarafa-ciplg-button .x-btn-small {
+    width: 80%;
+    height: 30px;
+    margin-left: 10%;
+    margin-right: 10%;
+    margin-top: 10px;
 }
