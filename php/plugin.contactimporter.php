@@ -33,9 +33,7 @@ class Plugincontactimporter extends Plugin
 	/**
 	 * Constructor
 	 */
-	function Plugincontactimporter()
-	{
-	}
+	function __construct() {}
 
 	/**
 	 * Function initializes the Plugin and registers all hooks

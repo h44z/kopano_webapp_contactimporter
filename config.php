@@ -6,5 +6,5 @@ define('PLUGIN_CONTACTIMPORTER_USER_DEFAULT_ENABLE', false);
 define('PLUGIN_CONTACTIMPORTER_DEFAULT', "Kontakte");
 
 /** Tempory path for uploaded files... */
-define('PLUGIN_CONTACTIMPORTER_TMP_UPLOAD', "/var/lib/zarafa-webapp/tmp/");
+define('PLUGIN_CONTACTIMPORTER_TMP_UPLOAD', "/var/lib/kopano-webapp/tmp/");
 ?>

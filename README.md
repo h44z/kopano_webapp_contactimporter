@@ -12,6 +12,8 @@ cd contactimporter
 ant deploy
 ```
 
+Make sure to run "composer install" in the php directory!
+
 ### Usage
 Rightclick a contactfolder or contact entry to export it as vCard.
 

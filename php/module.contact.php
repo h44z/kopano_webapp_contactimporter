@@ -38,7 +38,7 @@ class ContactModule extends Module
 	 */
 	public function __construct($id, $data)
 	{
-		parent::Module($id, $data);
+		parent::__construct($id, $data);
 	}
 
 	/**
