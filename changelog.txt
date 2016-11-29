@@ -1,3 +1,8 @@
+v2.0.2: 29.11.2016
+ - finally compatible with Kopano Webapp 3.1
+ - translation to german added
+ - Export notification is shown
+
 v2.0.1: 01.11.2016
  - compatible with Kopano Webapp 3.1
  - exporting contacts implemented
