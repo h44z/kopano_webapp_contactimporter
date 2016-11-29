@@ -1,0 +1,178 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Plugin Contactimporter\n"
+"POT-Creation-Date: 2016-11-29 15:59+0100\n"
+"PO-Revision-Date: 2016-11-29 15:59+0100\n"
+"Last-Translator: \n"
+"Language-Team: Christoph Haas <christoph.h@sprinternet.at>\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.7.1\n"
+"X-Poedit-Basepath: ../../..\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-SearchPath-0: php\n"
+"X-Poedit-SearchPath-1: js\n"
+
+#: js/dialogs/ImportContentPanel.js:45
+msgid "Import Contacts"
+msgstr "Kontakte Importieren"
+
+#: js/dialogs/ImportPanel.js:98
+msgid "Loading..."
+msgstr "Lade..."
+
+#: js/dialogs/ImportPanel.js:290
+msgid "Select contacts to import"
+msgstr "Kontakte für den Import auswählen"
+
+#: js/dialogs/ImportPanel.js:301
+msgid "Displayname"
+msgstr "Anzeigename"
+
+#: js/dialogs/ImportPanel.js:302
+msgid "Firstname"
+msgstr "Vorname"
+
+#: js/dialogs/ImportPanel.js:303
+msgid "Lastname"
+msgstr "Nachname"
+
+#: js/dialogs/ImportPanel.js:304
+msgid "Company"
+msgstr "Firma"
+
+#: js/dialogs/ImportPanel.js:325
+msgid "Select folder"
+msgstr "Ordner wählen"
+
+#: js/dialogs/ImportPanel.js:348
+msgid "Select an .vcf addressbook"
+msgstr "Wähle eine .vcf Datei"
+
+#: js/dialogs/ImportPanel.js:372
+msgid "Import"
+msgstr "Importieren"
+
+#: js/dialogs/ImportPanel.js:391
+msgid "Import All"
+msgstr "Alle Importieren"
+
+#: js/dialogs/ImportPanel.js:408
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: js/dialogs/ImportPanel.js:426
+msgid "Uploading and parsing contacts..."
+msgstr "Kontakte werden hochgeladen und verarbeitet..."
+
+#: js/dialogs/ImportPanel.js:432 js/dialogs/ImportPanel.js:531
+#: js/dialogs/ImportPanel.js:539 js/dialogs/ImportPanel.js:586
+#: js/plugin.contactimporter.js:164
+msgid "Error"
+msgstr "Fehler"
+
+#: js/dialogs/ImportPanel.js:487
+msgid "Parser Error"
+msgstr "Verarbeitungsfehler"
+
+#: js/dialogs/ImportPanel.js:532
+msgid "You have to choose an addressbook!"
+msgstr "Es muss ein Adressbuch ausgewählt werden!"
+
+#: js/dialogs/ImportPanel.js:540
+msgid "You have to choose at least one contact to import!"
+msgstr "Es muss mindestens ein Kontakt zum Import ausgewählt werden!"
+
+#. TRANSLATORS: {0} will be replaced by the number of contacts that were imported
+#: js/dialogs/ImportPanel.js:583
+msgid "Imported"
+msgstr "Importiert!"
+
+#: js/dialogs/ImportPanel.js:583
+msgid "Imported {0} contacts. Please reload your addressbook!"
+msgstr "{0} Kontakte wurden importiert. Bitte das Adressbuch neu laden."
+
+#. TRANSLATORS: {0} will be replaced by the error message
+#: js/dialogs/ImportPanel.js:588
+msgid "Import failed: {0}"
+msgstr "Importieren fehlgeschlagen: {0}"
+
+#: js/plugin.contactimporter.js:64 js/ui/ContextMenu.js:78
+msgid "Export vCard"
+msgstr "vCard exportieren"
+
+#: js/plugin.contactimporter.js:110 js/ui/ContextMenu.js:135
+msgid "Warning"
+msgstr "Warnung"
+
+#: js/plugin.contactimporter.js:139
+msgid "Import to Contacts"
+msgstr "In Kontakte importieren"
+
+#: js/plugin.contactimporter.js:178
+msgid "Please wait"
+msgstr "Bitte warten"
+
+#: js/plugin.contactimporter.js:179
+msgid "Loading attachment..."
+msgstr "Lade Anhang..."
+
+#: js/plugin.contactimporter.js:180
+msgid "Initializing..."
+msgstr "Initialisierung..."
+
+#. TRANSLATORS: {0} will be replaced by the percentage value (0-100)
+#: js/plugin.contactimporter.js:193
+msgid "{0}% loaded"
+msgstr "{0}% geladen"
+
+#: js/plugin.contactimporter.js:305
+msgid "Contactimporter Plugin"
+msgstr "Kontakt Plugin"
+
+#: js/ui/ContextMenu.js:66
+msgid "Import vCard"
+msgstr "vCard importieren"
+
+#: php/module.contact.php:245
+msgid "VCF file is empty!"
+msgstr "VCF Datei ist leer!"
+
+#. TRANSLATORS: Filename suffix for exported files
+#: php/module.contact.php:448
+msgid "_contacts.vcf"
+msgstr "_kontakte.vcf"
+
+#: php/module.contact.php:451
+msgid "No contacts found. Export skipped!"
+msgstr "Keine Kontakte gefunden. Export abgebrochen!"
+
+#: php/module.contact.php:728
+msgid "No contacts in vcf file"
+msgstr "Keine Kontakte in der VCF Datei"
+
+#: php/module.contact.php:739
+msgid "File could not be read by server"
+msgstr "Datei konnte vom Server nicht gelesen werden"
+
+#: php/module.contact.php:1141
+msgid "Store could not be opened!"
+msgstr "Datenbank konnte nicht geöffnet werden!"
+
+#: php/module.contact.php:1147
+msgid "Wrong call, store and entryid have to be set!"
+msgstr "Inkorrekter Aufruf!"
+
+#: php/upload.php:69
+msgid ""
+"File could not be moved to TMP path! Check plugin config and folder "
+"permissions!"
+msgstr "Temporärer Pfad ist nicht beschreibbar!"
+
+#: php/upload.php:72
+msgid "File could not be read by server, upload error!"
+msgstr ""
+"Datei konnte vom Server nicht gelesen werden. Hochladen fehlgeschlagen!"
