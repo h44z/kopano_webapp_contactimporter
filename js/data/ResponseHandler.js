@@ -1,5 +1,5 @@
 /**
- * ResponseHandler.js zarafa contact im/exporter
+ * ResponseHandler.js, Kopano Webapp contact to vcf im/exporter
  *
  * Author: Christoph Haas <christoph.h@sprinternet.at>
  * Copyright (C) 2012-2016 Christoph Haas
@@ -34,52 +34,52 @@ Ext.namespace('Zarafa.plugins.contactimporter.data');
  * Calendar specific response handler.
  */
 Zarafa.plugins.contactimporter.data.ResponseHandler = Ext.extend(Zarafa.core.data.AbstractResponseHandler, {
-	/**
-	 * @cfg {Function} successCallback The function which
-	 * will be called after success request.
-	 */
-	successCallback: null,
+    /**
+     * @cfg {Function} successCallback The function which
+     * will be called after success request.
+     */
+    successCallback: null,
 
-	/**
-	 * Call the successCallback callback function.
-	 * @param {Object} response Object contained the response data.
-	 */
-	doLoad: function (response) {
-		this.successCallback(response);
-	},
+    /**
+     * Call the successCallback callback function.
+     * @param {Object} response Object contained the response data.
+     */
+    doLoad: function (response) {
+        this.successCallback(response);
+    },
 
-	/**
-	 * Call the successCallback callback function.
-	 * @param {Object} response Object contained the response data.
-	 */
-	doImport: function (response) {
-		this.successCallback(response);
-	},
+    /**
+     * Call the successCallback callback function.
+     * @param {Object} response Object contained the response data.
+     */
+    doImport: function (response) {
+        this.successCallback(response);
+    },
 
-	/**
-	 * Call the successCallback callback function.
-	 * @param {Object} response Object contained the response data.
-	 */
-	doExport: function (response) {
-		this.successCallback(response);
-	},
+    /**
+     * Call the successCallback callback function.
+     * @param {Object} response Object contained the response data.
+     */
+    doExport: function (response) {
+        this.successCallback(response);
+    },
 
-	/**
-	 * Call the successCallback callback function.
-	 * @param {Object} response Object contained the response data.
-	 */
-	doImportattachment: function (response) {
-		this.successCallback(response);
-	},
+    /**
+     * Call the successCallback callback function.
+     * @param {Object} response Object contained the response data.
+     */
+    doImportattachment: function (response) {
+        this.successCallback(response);
+    },
 
-	/**
-	 * In case exception happened on server, server will return
-	 * exception response with the code of exception.
-	 * @param {Object} response Object contained the response data.
-	 */
-	doError: function (response) {
-		alert("error response code: " + response.error.info.code);
-	}
+    /**
+     * In case exception happened on server, server will return
+     * exception response with the code of exception.
+     * @param {Object} response Object contained the response data.
+     */
+    doError: function (response) {
+        alert("error response code: " + response.error.info.code);
+    }
 });
 
 Ext.reg('contactimporter.contactresponsehandler', Zarafa.plugins.contactimporter.data.ResponseHandler);

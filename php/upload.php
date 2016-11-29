@@ -71,4 +71,3 @@ if (is_readable($_FILES['vcfdata']['tmp_name'])) {
 } else {
     respondJSON(array('success' => false, 'error' => dgettext("plugin_contactimporter", "File could not be read by server, upload error!")));
 }
-?>

@@ -1,5 +1,5 @@
 /**
- * ImportContentPanel.js zarafa contact to vcf im/exporter
+ * ImportContentPanel.js, Kopano Webapp contact to vcf im/exporter
  *
  * Author: Christoph Haas <christoph.h@sprinternet.at>
  * Copyright (C) 2012-2016 Christoph Haas
@@ -36,31 +36,31 @@ Ext.namespace("Zarafa.plugins.contactimporter.dialogs");
  */
 Zarafa.plugins.contactimporter.dialogs.ImportContentPanel = Ext.extend(Zarafa.core.ui.ContentPanel, {
 
-	/**
-	 * @constructor
-	 * @param config Configuration structure
-	 */
-	constructor: function (config) {
-		config = config || {};
-		var title = _('Import Contacts');
-		Ext.applyIf(config, {
-			layout     : 'fit',
-			title      : title,
-			closeOnSave: true,
-			width      : 620,
-			height     : 465,
-			//Add panel
-			items      : [
-				{
-					xtype   : 'contactimporter.importcontactpanel',
-					filename: config.filename,
-					folder  : config.folder
-				}
-			]
-		});
+    /**
+     * @constructor
+     * @param config Configuration structure
+     */
+    constructor: function (config) {
+        config = config || {};
+        var title = dgettext('plugin_contactimporter', 'Import Contacts');
+        Ext.applyIf(config, {
+            layout: 'fit',
+            title: title,
+            closeOnSave: true,
+            width: 620,
+            height: 465,
+            //Add panel
+            items: [
+                {
+                    xtype: 'contactimporter.importcontactpanel',
+                    filename: config.filename,
+                    folder: config.folder
+                }
+            ]
+        });
 
-		Zarafa.plugins.contactimporter.dialogs.ImportContentPanel.superclass.constructor.call(this, config);
-	}
+        Zarafa.plugins.contactimporter.dialogs.ImportContentPanel.superclass.constructor.call(this, config);
+    }
 
 });
 
