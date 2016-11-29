@@ -2,17 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="aae153d8-808f-4371-b0e9-9ee7ff904cab" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/js/dialogs/fields.txt" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/languages/en_US.UTF-8/LC_MESSAGES/plugin_calendarimporter.mo" afterPath="$PROJECT_DIR$/languages/en_US.UTF-8/LC_MESSAGES/plugin_calendarimporter.mo" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/ABOUT.js" afterPath="$PROJECT_DIR$/js/ABOUT.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/data/ResponseHandler.js" afterPath="$PROJECT_DIR$/js/data/ResponseHandler.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/dialogs/ImportContentPanel.js" afterPath="$PROJECT_DIR$/js/dialogs/ImportContentPanel.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/dialogs/ImportPanel.js" afterPath="$PROJECT_DIR$/js/dialogs/ImportPanel.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/plugin.contactimporter.js" afterPath="$PROJECT_DIR$/js/plugin.contactimporter.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/ui/ContextMenu.js" afterPath="$PROJECT_DIR$/js/ui/ContextMenu.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/languages/en_US.UTF-8/LC_MESSAGES/plugin_calendarimporter.po" afterPath="$PROJECT_DIR$/languages/en_US.UTF-8/LC_MESSAGES/plugin_calendarimporter.po" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/php/upload.php" afterPath="$PROJECT_DIR$/php/upload.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Makefile" afterPath="$PROJECT_DIR$/Makefile" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build.xml" afterPath="$PROJECT_DIR$/build.xml" />
     </list>
     <ignored path="contactimporter.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -100,8 +91,28 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="plugin_calendarimporter.po" pinned="false" current-in-tab="true">
+      <file leaf-file-name="plugin_calendarimporter.po" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/languages/en_US.UTF-8/LC_MESSAGES/plugin_calendarimporter.po">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="build.xml" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/build.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="165">
+              <caret line="167" column="18" selection-start-line="167" selection-start-column="18" selection-end-line="167" selection-end-column="18" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="manifest.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/manifest.xml">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="0">
               <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -141,6 +152,7 @@
         <option value="$PROJECT_DIR$/js/dialogs/ImportPanel.js" />
         <option value="$PROJECT_DIR$/js/data/ResponseHandler.js" />
         <option value="$PROJECT_DIR$/php/upload.php" />
+        <option value="$PROJECT_DIR$/build.xml" />
       </list>
     </option>
   </component>
@@ -410,18 +422,18 @@
       <updated>1480428196914</updated>
       <workItem from="1480428199144" duration="44000" />
       <workItem from="1480428259775" duration="69000" />
-      <workItem from="1480428330068" duration="2756000" />
+      <workItem from="1480428330068" duration="5601000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="2869000" />
+    <option name="totallyTimeSpent" value="5714000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="65" y="24" width="1792" height="999" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -586,6 +598,22 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/manifest.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="167" column="18" selection-start-line="167" selection-start-column="18" selection-end-line="167" selection-end-column="18" />
           <folding />
         </state>
       </provider>
