@@ -9,6 +9,9 @@
 		<authorURL>http://www.sprinternet.at</authorURL>
 		<description>Import or Export a VCF file to/from the zarafa addressbook</description>
 	</info>
+	<translations>
+		<translationsdir>languages</translationsdir>
+	</translations>
 	<config>
 		<configfile>config.php</configfile>
 	</config>

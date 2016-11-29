@@ -1,7 +1,7 @@
 <?php
 
 /**
- * download.php, zarafa contact to vcf im/exporter
+ * download.php, Kopano Webapp contact to vcf im/exporter
  *
  * Author: Christoph Haas <christoph.h@sprinternet.at>
  * Copyright (C) 2012-2016 Christoph Haas
@@ -25,7 +25,6 @@ class DownloadHandler
 {
 	/**
 	 * Download the given vcf file.
-	 * @return bool
 	 */
 	public static function doDownload()
 	{

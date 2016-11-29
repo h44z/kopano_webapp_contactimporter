@@ -7,4 +7,3 @@ define('PLUGIN_CONTACTIMPORTER_DEFAULT', "Kontakte");
 
 /** Tempory path for uploaded files... */
 define('PLUGIN_CONTACTIMPORTER_TMP_UPLOAD', "/var/lib/kopano-webapp/tmp/");
-?>

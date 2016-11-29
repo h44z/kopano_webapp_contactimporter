@@ -1,6 +1,6 @@
 <?php
 /**
- * upload.php, zarafa contact to vcf im/exporter
+ * upload.php, Kopano Webapp contact to vcf im/exporter
  *
  * Author: Christoph Haas <christoph.h@sprinternet.at>
  * Copyright (C) 2012-2016 Christoph Haas
@@ -32,7 +32,7 @@ ini_set('display_errors', '0');
  */
 function respondJSON($arr)
 {
-	echo json_encode($arr);
+    echo json_encode($arr);
 }
 
 /**
@@ -42,33 +42,33 @@ function respondJSON($arr)
  */
 function randomstring($length = 6)
 {
-	// $chars - all allowed charakters
-	$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+    // $chars - all allowed charakters
+    $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 
-	srand((double)microtime() * 1000000);
-	$i = 0;
-	$pass = "";
-	while ($i < $length) {
-		$num = rand() % strlen($chars);
-		$tmp = substr($chars, $num, 1);
-		$pass = $pass . $tmp;
-		$i++;
-	}
-	return $pass;
+    srand((double)microtime() * 1000000);
+    $i = 0;
+    $pass = "";
+    while ($i < $length) {
+        $num = rand() % strlen($chars);
+        $tmp = substr($chars, $num, 1);
+        $pass = $pass . $tmp;
+        $i++;
+    }
+    return $pass;
 }
 
 $destpath = PLUGIN_CONTACTIMPORTER_TMP_UPLOAD;
 $destpath .= $_FILES['vcfdata']['name'] . randomstring();
 
 if (is_readable($_FILES['vcfdata']['tmp_name'])) {
-	$result = move_uploaded_file($_FILES['vcfdata']['tmp_name'], $destpath);
+    $result = move_uploaded_file($_FILES['vcfdata']['tmp_name'], $destpath);
 
-	if ($result) {
-		respondJSON(array('success' => true, 'vcf_file' => $destpath));
-	} else {
-		respondJSON(array('success' => false, 'error' => "File could not be moved to TMP path! Check plugin config and folder permissions!"));
-	}
+    if ($result) {
+        respondJSON(array('success' => true, 'vcf_file' => $destpath));
+    } else {
+        respondJSON(array('success' => false, 'error' => dgettext("plugin_contactimporter", "File could not be moved to TMP path! Check plugin config and folder permissions!")));
+    }
 } else {
-	respondJSON(array('success' => false, 'error' => "File could not be read by server, upload error!"));
+    respondJSON(array('success' => false, 'error' => dgettext("plugin_contactimporter", "File could not be read by server, upload error!")));
 }
 ?>
