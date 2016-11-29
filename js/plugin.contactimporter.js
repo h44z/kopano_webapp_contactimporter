@@ -88,6 +88,11 @@ Zarafa.plugins.contactimporter.ImportPlugin = Ext.extend(Zarafa.core.Plugin, {		
             scope: this
         });
 
+        // Notify user
+        // # TRANSLATORS: {0} will be replaced by the number of contacts that will be exported
+        container.getNotifier().notify('info', dgettext('plugin_contactimporter', 'Contact Export'), String.format(dgettext('plugin_contactimporter', 'Exporting {0} contacts. Please wait...'), recordIds.length));
+
+
         // request attachment preperation
         container.getRequest().singleRequest(
             'contactmodule',

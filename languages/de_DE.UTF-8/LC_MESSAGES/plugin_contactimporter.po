@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Plugin Contactimporter\n"
-"POT-Creation-Date: 2016-11-29 15:59+0100\n"
-"PO-Revision-Date: 2016-11-29 15:59+0100\n"
+"POT-Creation-Date: 2016-11-29 18:35+0100\n"
+"PO-Revision-Date: 2016-11-29 18:35+0100\n"
 "Last-Translator: \n"
 "Language-Team: Christoph Haas <christoph.h@sprinternet.at>\n"
 "Language: de\n"
@@ -70,7 +70,7 @@ msgstr "Kontakte werden hochgeladen und verarbeitet..."
 
 #: js/dialogs/ImportPanel.js:432 js/dialogs/ImportPanel.js:531
 #: js/dialogs/ImportPanel.js:539 js/dialogs/ImportPanel.js:586
-#: js/plugin.contactimporter.js:164
+#: js/plugin.contactimporter.js:169
 msgid "Error"
 msgstr "Fehler"
 
@@ -104,32 +104,42 @@ msgstr "Importieren fehlgeschlagen: {0}"
 msgid "Export vCard"
 msgstr "vCard exportieren"
 
-#: js/plugin.contactimporter.js:110 js/ui/ContextMenu.js:135
+#. TRANSLATORS: {0} will be replaced by the number of contacts that will be exported
+#. TRANSLATORS: {0} will be replaced by the number of contacts that will be exported
+#: js/plugin.contactimporter.js:93 js/ui/ContextMenu.js:104
+msgid "Contact Export"
+msgstr "Kontaktexport"
+
+#: js/plugin.contactimporter.js:93 js/ui/ContextMenu.js:104
+msgid "Exporting {0} contacts. Please wait..."
+msgstr "Exportiere {0} Kontakte. Bitte warten..."
+
+#: js/plugin.contactimporter.js:115 js/ui/ContextMenu.js:139
 msgid "Warning"
 msgstr "Warnung"
 
-#: js/plugin.contactimporter.js:139
+#: js/plugin.contactimporter.js:144
 msgid "Import to Contacts"
 msgstr "In Kontakte importieren"
 
-#: js/plugin.contactimporter.js:178
+#: js/plugin.contactimporter.js:183
 msgid "Please wait"
 msgstr "Bitte warten"
 
-#: js/plugin.contactimporter.js:179
+#: js/plugin.contactimporter.js:184
 msgid "Loading attachment..."
 msgstr "Lade Anhang..."
 
-#: js/plugin.contactimporter.js:180
+#: js/plugin.contactimporter.js:185
 msgid "Initializing..."
 msgstr "Initialisierung..."
 
 #. TRANSLATORS: {0} will be replaced by the percentage value (0-100)
-#: js/plugin.contactimporter.js:193
+#: js/plugin.contactimporter.js:198
 msgid "{0}% loaded"
 msgstr "{0}% geladen"
 
-#: js/plugin.contactimporter.js:305
+#: js/plugin.contactimporter.js:310
 msgid "Contactimporter Plugin"
 msgstr "Kontakt Plugin"
 
