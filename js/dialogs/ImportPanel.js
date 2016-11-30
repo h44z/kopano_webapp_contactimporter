@@ -133,121 +133,6 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
     },
 
     /**
-     * Get all contact folders.
-     * @param {boolean} asDropdownStore If true, a simple array store will be returned.
-     * @returns {*}
-     */
-    getAllContactFolders: function (asDropdownStore) {
-        asDropdownStore = Ext.isEmpty(asDropdownStore) ? false : asDropdownStore;
-
-        var allFolders = [];
-
-        var defaultContactFolder = container.getHierarchyStore().getDefaultFolder('contact');
-
-        var inbox = container.getHierarchyStore().getDefaultStore();
-        var pub = container.getHierarchyStore().getPublicStore();
-
-        if (!Ext.isEmpty(inbox.subStores) && inbox.subStores.folders.totalLength > 0) {
-            for (var i = 0; i < inbox.subStores.folders.totalLength; i++) {
-                var folder = inbox.subStores.folders.getAt(i);
-                if (!Ext.isEmpty(folder) && folder.get("container_class") == "IPF.Contact") {
-                    if (asDropdownStore) {
-                        allFolders.push([
-                            folder.get("entryid"),
-                            folder.get("display_name")
-                        ]);
-                    } else {
-                        allFolders.push({
-                            display_name: folder.get("display_name"),
-                            entryid: folder.get("entryid"),
-                            store_entryid: folder.get("store_entryid"),
-                            is_public: false
-                        });
-                    }
-                }
-            }
-        }
-
-        if (!Ext.isEmpty(pub.subStores) && pub.subStores.folders.totalLength > 0) {
-            for (var j = 0; j < pub.subStores.folders.totalLength; j++) {
-                var folder = pub.subStores.folders.getAt(j);
-                if (!Ext.isEmpty(folder) && folder.get("container_class") == "IPF.Contact") {
-                    if (asDropdownStore) {
-                        allFolders.push([
-                            folder.get("entryid"),
-                            folder.get("display_name") + " (Public)"
-                        ]);
-                    } else {
-                        allFolders.push({
-                            display_name: folder.get("display_name"),
-                            entryid: folder.get("entryid"),
-                            store_entryid: folder.get("store_entryid"),
-                            is_public: true
-                        });
-                    }
-                }
-            }
-        }
-
-        if (asDropdownStore) {
-            return allFolders.sort(this.dynamicSort(1));
-        } else {
-            return allFolders;
-        }
-    },
-
-    /**
-     * Dynamic sort function, sorts by property name.
-     * @param {string|int} property
-     * @returns {Function}
-     */
-    dynamicSort: function (property) {
-        var sortOrder = 1;
-        if (property[0] === "-") {
-            sortOrder = -1;
-            property = property.substr(1);
-        }
-        return function (a, b) {
-            var result = (a[property].toLowerCase() < b[property].toLowerCase()) ? -1 : (a[property].toLowerCase() > b[property].toLowerCase()) ? 1 : 0;
-            return result * sortOrder;
-        }
-    },
-
-    /**
-     * Return a contact folder element by name.
-     * @param {string} name
-     * @returns {*}
-     */
-    getContactFolderByName: function (name) {
-        var folders = this.getAllContactFolders(false);
-
-        for (var i = 0; i < folders.length; i++) {
-            if (folders[i].display_name == name) {
-                return folders[i];
-            }
-        }
-
-        return container.getHierarchyStore().getDefaultFolder('contact');
-    },
-
-    /**
-     * Return a contact folder element by entryid.
-     * @param {string} entryid
-     * @returns {*}
-     */
-    getContactFolderByEntryid: function (entryid) {
-        var folders = this.getAllContactFolders(false);
-
-        for (var i = 0; i < folders.length; i++) {
-            if (folders[i].entryid == entryid) {
-                return folders[i];
-            }
-        }
-
-        return container.getHierarchyStore().getDefaultFolder('contact');
-    },
-
-    /**
      * Reloads the data of the grid
      * @private
      */
@@ -309,18 +194,18 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
     },
 
     /**
-     * Generate the UI calendar select box.
+     * Generate the UI addressbook select box.
      * @returns {*}
      */
     createSelectBox: function () {
-        var myStore = this.getAllContactFolders(true);
+        var myStore = Zarafa.plugins.contactimporter.data.Actions.getAllContactFolders(true);
 
         return {
             xtype: "selectbox",
             ref: 'addressbookSelector',
             editable: false,
             name: "choosen_addressbook",
-            value: Ext.isEmpty(this.folder) ? this.getContactFolderByName(container.getSettingsModel().get("zarafa/v1/plugins/contactimporter/default_addressbook")).entryid : this.folder,
+            value: Ext.isEmpty(this.folder) ? Zarafa.plugins.contactimporter.data.Actions.getContactFolderByName(container.getSettingsModel().get("zarafa/v1/plugins/contactimporter/default_addressbook")).entryid : this.folder,
             width: 100,
             fieldLabel: dgettext('plugin_contactimporter', 'Select folder'),
             store: myStore,
@@ -430,7 +315,7 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
                     this.submitAllButton.disable();
                     Zarafa.common.dialogs.MessageBox.show({
                         title: dgettext('plugin_contactimporter', 'Error'),
-                        msg: _(action.result.error),
+                        msg: action.result.error,
                         icon: Zarafa.common.dialogs.MessageBox.ERROR,
                         buttons: Zarafa.common.dialogs.MessageBox.OK
                     });
@@ -542,7 +427,7 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
                     buttons: Zarafa.common.dialogs.MessageBox.OK
                 });
             } else {
-                var contactFolder = this.getContactFolderByEntryid(folderValue);
+                var contactFolder = Zarafa.plugins.contactimporter.data.Actions.getContactFolderByEntryid(folderValue);
 
                 this.loadMask.show();
                 var uids = [];
