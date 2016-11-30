@@ -111,14 +111,16 @@ Zarafa.plugins.contactimporter.data.Actions = {
     },
 
     /**
-     * Get all calendar folders.
+     * Get all contact folders.
      * @param {boolean} asDropdownStore If true, a simple array store will be returned.
      * @returns {*}
      */
-    getAllCalendarFolders: function (asDropdownStore) {
+    getAllContactFolders: function (asDropdownStore) {
         asDropdownStore = Ext.isEmpty(asDropdownStore) ? false : asDropdownStore;
 
         var allFolders = [];
+
+        var defaultContactFolder = container.getHierarchyStore().getDefaultFolder('contact');
 
         var inbox = container.getHierarchyStore().getDefaultStore();
         var pub = container.getHierarchyStore().getPublicStore();
@@ -126,7 +128,7 @@ Zarafa.plugins.contactimporter.data.Actions = {
         if (!Ext.isEmpty(inbox.subStores) && inbox.subStores.folders.totalLength > 0) {
             for (var i = 0; i < inbox.subStores.folders.totalLength; i++) {
                 var folder = inbox.subStores.folders.getAt(i);
-                if (!Ext.isEmpty(folder) && folder.get("container_class") == "IPF.Appointment") {
+                if (!Ext.isEmpty(folder) && folder.get("container_class") == "IPF.Contact") {
                     if (asDropdownStore) {
                         allFolders.push([
                             folder.get("entryid"),
@@ -147,7 +149,7 @@ Zarafa.plugins.contactimporter.data.Actions = {
         if (!Ext.isEmpty(pub.subStores) && pub.subStores.folders.totalLength > 0) {
             for (var j = 0; j < pub.subStores.folders.totalLength; j++) {
                 var folder = pub.subStores.folders.getAt(j);
-                if (!Ext.isEmpty(folder) && folder.get("container_class") == "IPF.Appointment") {
+                if (!Ext.isEmpty(folder) && folder.get("container_class") == "IPF.Contact") {
                     if (asDropdownStore) {
                         allFolders.push([
                             folder.get("entryid"),
@@ -173,40 +175,6 @@ Zarafa.plugins.contactimporter.data.Actions = {
     },
 
     /**
-     * Return a calendar folder element by name.
-     * @param {string} name
-     * @returns {*}
-     */
-    getCalendarFolderByName: function (name) {
-        var folders = Zarafa.plugins.contactimporter.data.Actions.getAllCalendarFolders(false);
-
-        for (var i = 0; i < folders.length; i++) {
-            if (folders[i].display_name == name) {
-                return folders[i];
-            }
-        }
-
-        return container.getHierarchyStore().getDefaultFolder('calendar');
-    },
-
-    /**
-     * Return a calendar folder element by entryid.
-     * @param {string} entryid
-     * @returns {*}
-     */
-    getCalendarFolderByEntryid: function (entryid) {
-        var folders = Zarafa.plugins.contactimporter.data.Actions.getAllCalendarFolders(false);
-
-        for (var i = 0; i < folders.length; i++) {
-            if (folders[i].entryid == entryid) {
-                return folders[i];
-            }
-        }
-
-        return container.getHierarchyStore().getDefaultFolder('calendar');
-    },
-
-    /**
      * Dynamic sort function, sorts by property name.
      * @param {string|int} property
      * @returns {Function}
@@ -221,5 +189,39 @@ Zarafa.plugins.contactimporter.data.Actions = {
             var result = (a[property].toLowerCase() < b[property].toLowerCase()) ? -1 : (a[property].toLowerCase() > b[property].toLowerCase()) ? 1 : 0;
             return result * sortOrder;
         }
+    },
+
+    /**
+     * Return a contact folder element by name.
+     * @param {string} name
+     * @returns {*}
+     */
+    getContactFolderByName: function (name) {
+        var folders = Zarafa.plugins.contactimporter.data.Actions.getAllContactFolders(false);
+
+        for (var i = 0; i < folders.length; i++) {
+            if (folders[i].display_name == name) {
+                return folders[i];
+            }
+        }
+
+        return container.getHierarchyStore().getDefaultFolder('contact');
+    },
+
+    /**
+     * Return a contact folder element by entryid.
+     * @param {string} entryid
+     * @returns {*}
+     */
+    getContactFolderByEntryid: function (entryid) {
+        var folders = Zarafa.plugins.contactimporter.data.Actions.getAllContactFolders(false);
+
+        for (var i = 0; i < folders.length; i++) {
+            if (folders[i].entryid == entryid) {
+                return folders[i];
+            }
+        }
+
+        return container.getHierarchyStore().getDefaultFolder('contact');
     }
 };
