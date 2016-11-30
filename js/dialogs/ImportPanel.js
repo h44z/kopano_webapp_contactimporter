@@ -194,7 +194,7 @@ Zarafa.plugins.contactimporter.dialogs.ImportPanel = Ext.extend(Ext.Panel, {
     },
 
     /**
-     * Generate the UI calendar select box.
+     * Generate the UI addressbook select box.
      * @returns {*}
      */
     createSelectBox: function () {

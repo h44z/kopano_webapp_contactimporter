@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="aae153d8-808f-4371-b0e9-9ee7ff904cab" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/data/Actions.js" afterPath="$PROJECT_DIR$/js/data/Actions.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/dialogs/ImportPanel.js" afterPath="$PROJECT_DIR$/js/dialogs/ImportPanel.js" />
     </list>
     <ignored path="contactimporter.iws" />
@@ -70,8 +69,8 @@
       <file leaf-file-name="ImportPanel.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/js/dialogs/ImportPanel.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="497">
-              <caret line="335" column="30" selection-start-line="335" selection-start-column="30" selection-end-line="335" selection-end-column="30" />
+            <state relative-caret-position="287">
+              <caret line="196" column="46" selection-start-line="196" selection-start-column="46" selection-end-line="196" selection-end-column="46" />
               <folding>
                 <element signature="n#!!doc" expanded="true" />
               </folding>
@@ -362,12 +361,12 @@
       <workItem from="1480428199144" duration="44000" />
       <workItem from="1480428259775" duration="69000" />
       <workItem from="1480428330068" duration="6691000" />
-      <workItem from="1480504955898" duration="3734000" />
+      <workItem from="1480504955898" duration="4182000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="10538000" />
+    <option name="totallyTimeSpent" value="10986000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="65" y="24" width="1792" height="999" extended-state="6" />
@@ -651,8 +650,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/js/dialogs/ImportPanel.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="497">
-          <caret line="335" column="30" selection-start-line="335" selection-start-column="30" selection-end-line="335" selection-end-column="30" />
+        <state relative-caret-position="287">
+          <caret line="196" column="46" selection-start-line="196" selection-start-column="46" selection-end-line="196" selection-end-column="46" />
           <folding>
             <element signature="n#!!doc" expanded="true" />
           </folding>
