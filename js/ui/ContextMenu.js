@@ -94,25 +94,7 @@ Zarafa.plugins.contactimporter.ui.ContextMenu = Ext.extend(Zarafa.hierarchy.ui.C
      * @private
      */
     onContextItemExport: function () {
-        var responseHandler = new Zarafa.plugins.contactimporter.data.ResponseHandler({
-            successCallback: this.downloadVCF,
-            scope: this
-        });
-
-        // Notify user
-        // # TRANSLATORS: {0} will be replaced by the number of contacts that will be exported
-        container.getNotifier().notify('info', dgettext('plugin_contactimporter', 'Contact Export'), String.format(dgettext('plugin_contactimporter', 'Exporting {0} contacts. Please wait...'), this.records.get('content_count')));
-
-        // request attachment preperation
-        container.getRequest().singleRequest(
-            'contactmodule',
-            'export',
-            {
-                storeid: this.records.get("store_entryid"),
-                folder: this.records.get("entryid")
-            },
-            responseHandler
-        );
+        Zarafa.plugins.contactimporter.data.Actions.exportToVCF(this.records.get("store_entryid"), undefined, this.records);
     },
 
     /**
@@ -127,35 +109,6 @@ Zarafa.plugins.contactimporter.ui.ContextMenu = Ext.extend(Zarafa.hierarchy.ui.C
         };
 
         Zarafa.core.data.UIFactory.openLayerComponent(componentType, undefined, config);
-    },
-
-    /**
-     * Callback for the export request.
-     * @param {Object} response
-     */
-    downloadVCF: function (response) {
-        if (response.status == false) {
-            Zarafa.common.dialogs.MessageBox.show({
-                title: dgettext('plugin_contactimporter', 'Warning'),
-                msg: response.message,
-                icon: Zarafa.common.dialogs.MessageBox.WARNING,
-                buttons: Zarafa.common.dialogs.MessageBox.OK
-            });
-        } else {
-            var downloadFrame = Ext.getBody().createChild({
-                tag: 'iframe',
-                cls: 'x-hidden'
-            });
-
-            var url = document.URL;
-            var link = url.substring(0, url.lastIndexOf('/') + 1);
-
-            link += "index.php?sessionid=" + container.getUser().getSessionId() + "&load=custom&name=download_vcf";
-            link = Ext.urlAppend(link, "token=" + encodeURIComponent(response.download_token));
-            link = Ext.urlAppend(link, "filename=" + encodeURIComponent(response.filename));
-
-            downloadFrame.dom.contentWindow.location = link;
-        }
     }
 });
 
