@@ -1,4 +1,5 @@
 <?php
+
 /**
  * helper.php, Kopano Webapp contact to vcf im/exporter
  *
@@ -21,9 +22,7 @@
  *
  */
 
-
 namespace contactimporter;
-
 
 class Helper
 {

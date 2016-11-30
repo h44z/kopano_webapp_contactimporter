@@ -2,9 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="aae153d8-808f-4371-b0e9-9ee7ff904cab" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/php/helper.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/dictionaries/osboxes.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/php/helper.php" afterPath="$PROJECT_DIR$/php/helper.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/php/module.contact.php" afterPath="$PROJECT_DIR$/php/module.contact.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/php/upload.php" afterPath="$PROJECT_DIR$/php/upload.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/php/plugin.contactimporter.php" afterPath="$PROJECT_DIR$/php/plugin.contactimporter.php" />
     </list>
     <ignored path="contactimporter.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -25,37 +26,25 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="download.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/php/download.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="300">
-              <caret line="41" column="9" selection-start-line="41" selection-start-column="9" selection-end-line="41" selection-end-column="9" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="upload.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/php/upload.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="271">
-              <caret line="22" column="3" selection-start-line="22" selection-start-column="3" selection-end-line="22" selection-end-column="3" />
-              <folding>
-                <element signature="e#7#912#0#PHP" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="module.contact.php" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/php/module.contact.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="234">
-              <caret line="275" column="22" selection-start-line="275" selection-start-column="22" selection-end-line="275" selection-end-column="22" />
+            <state relative-caret-position="670">
+              <caret line="784" column="47" selection-start-line="784" selection-start-column="47" selection-end-line="784" selection-end-column="47" />
               <folding>
-                <element signature="e#6#919#0#PHP" expanded="true" />
-                <element signature="e#1009#1042#0#PHP" expanded="true" />
+                <element signature="e#7#920#0#PHP" expanded="true" />
+                <element signature="e#1010#1043#0#PHP" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="plugin.contactimporter.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/php/plugin.contactimporter.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="420">
+              <caret line="28" column="31" selection-start-line="28" selection-start-column="31" selection-end-line="28" selection-end-column="31" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -63,9 +52,11 @@
       <file leaf-file-name="helper.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/php/helper.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="30">
-              <caret line="2" column="55" selection-start-line="2" selection-start-column="55" selection-end-line="2" selection-end-column="55" />
-              <folding />
+            <state relative-caret-position="15">
+              <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+              <folding>
+                <element signature="e#7#912#0#PHP" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -78,7 +69,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/php/plugin.contactimporter.php" />
         <option value="$PROJECT_DIR$/config.php" />
         <option value="$PROJECT_DIR$/js/ABOUT.js" />
         <option value="$PROJECT_DIR$/js/dialogs/ImportContentPanel.js" />
@@ -90,8 +80,9 @@
         <option value="$PROJECT_DIR$/changelog.txt" />
         <option value="$PROJECT_DIR$/manifest.xml" />
         <option value="$PROJECT_DIR$/php/download.php" />
-        <option value="$PROJECT_DIR$/php/helper.php" />
         <option value="$PROJECT_DIR$/php/upload.php" />
+        <option value="$PROJECT_DIR$/php/helper.php" />
+        <option value="$PROJECT_DIR$/php/plugin.contactimporter.php" />
         <option value="$PROJECT_DIR$/php/module.contact.php" />
       </list>
     </option>
@@ -323,12 +314,12 @@
       <workItem from="1480428199144" duration="44000" />
       <workItem from="1480428259775" duration="69000" />
       <workItem from="1480428330068" duration="6691000" />
-      <workItem from="1480504955898" duration="525000" />
+      <workItem from="1480504955898" duration="1406000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="7329000" />
+    <option name="totallyTimeSpent" value="8210000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="65" y="24" width="1792" height="999" extended-state="6" />
@@ -469,13 +460,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1200">
           <caret line="80" column="13" selection-start-line="80" selection-start-column="8" selection-end-line="80" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/php/plugin.contactimporter.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="675">
-          <caret line="84" column="83" selection-start-line="84" selection-start-column="83" selection-end-line="84" selection-end-column="83" />
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -508,14 +495,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1515">
           <caret line="101" column="8" selection-start-line="101" selection-start-column="8" selection-end-line="104" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/config.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="75" selection-start-line="8" selection-start-column="75" selection-end-line="8" selection-end-column="75" />
           <folding />
         </state>
       </provider>
@@ -568,23 +547,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/php/download.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
+        <state relative-caret-position="615">
           <caret line="41" column="9" selection-start-line="41" selection-start-column="9" selection-end-line="41" selection-end-column="9" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/php/helper.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="55" selection-start-line="2" selection-start-column="55" selection-end-line="2" selection-end-column="55" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/php/upload.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="271">
+        <state relative-caret-position="330">
           <caret line="22" column="3" selection-start-line="22" selection-start-column="3" selection-end-line="22" selection-end-column="3" />
           <folding>
             <element signature="e#7#912#0#PHP" expanded="true" />
@@ -592,13 +563,39 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/config.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="5" column="38" selection-start-line="5" selection-start-column="8" selection-end-line="5" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/php/helper.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+          <folding>
+            <element signature="e#7#912#0#PHP" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/php/plugin.contactimporter.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="420">
+          <caret line="28" column="31" selection-start-line="28" selection-start-column="31" selection-end-line="28" selection-end-column="31" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/php/module.contact.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="234">
-          <caret line="275" column="22" selection-start-line="275" selection-start-column="22" selection-end-line="275" selection-end-column="22" />
+        <state relative-caret-position="670">
+          <caret line="784" column="47" selection-start-line="784" selection-start-column="47" selection-end-line="784" selection-end-column="47" />
           <folding>
-            <element signature="e#6#919#0#PHP" expanded="true" />
-            <element signature="e#1009#1042#0#PHP" expanded="true" />
+            <element signature="e#7#920#0#PHP" expanded="true" />
+            <element signature="e#1010#1043#0#PHP" expanded="true" />
           </folding>
         </state>
       </provider>
