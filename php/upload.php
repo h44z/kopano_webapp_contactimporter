@@ -1,4 +1,5 @@
 <?php
+
 /**
  * upload.php, Kopano Webapp contact to vcf im/exporter
  *
@@ -21,53 +22,35 @@
  *
  */
 
-require_once("../config.php");
+require_once(__DIR__ . "/../config.php");
+require_once(__DIR__ . "/helper.php");
+
+require_once(__DIR__ . '/../../../init.php');
+require_once(__DIR__ . "/../../../server/includes/core/class.webappauthentication.php"); // for checking the session
+
+use contactimporter\Helper;
 
 /* disable error printing - otherwise json communication might break... */
 ini_set('display_errors', '0');
 
-/**
- * respond/echo JSON
- * @param $arr
- */
-function respondJSON($arr)
-{
-    echo json_encode($arr);
+// check session
+// otherwise a DOS attack might be possible
+if (!WebAppAuthentication::getUserName() || WebAppAuthentication::getUserName() == "") {
+    Helper::respondJSON(array('success' => false, 'error' => dgettext("plugin_contactimporter", "Not authenticated!")));
+    die();
 }
-
-/**
- * Generates a random string with variable length.
- * @param $length the lenght of the generated string
- * @return string a random string
- */
-function randomstring($length = 6)
-{
-    // $chars - all allowed charakters
-    $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-
-    srand((double)microtime() * 1000000);
-    $i = 0;
-    $pass = "";
-    while ($i < $length) {
-        $num = rand() % strlen($chars);
-        $tmp = substr($chars, $num, 1);
-        $pass = $pass . $tmp;
-        $i++;
-    }
-    return $pass;
-}
-
-$destpath = PLUGIN_CONTACTIMPORTER_TMP_UPLOAD;
-$destpath .= $_FILES['vcfdata']['name'] . randomstring();
 
 if (is_readable($_FILES['vcfdata']['tmp_name'])) {
-    $result = move_uploaded_file($_FILES['vcfdata']['tmp_name'], $destpath);
+    $dstPath = PLUGIN_CONTACTIMPORTER_TMP_UPLOAD;
+    $dstPath .= $_FILES['vcfdata']['name'] . Helper::randomstring();
+
+    $result = move_uploaded_file($_FILES['vcfdata']['tmp_name'], $dstPath);
 
     if ($result) {
-        respondJSON(array('success' => true, 'vcf_file' => $destpath));
+        Helper::respondJSON(array('success' => true, 'vcf_file' => $dstPath));
     } else {
-        respondJSON(array('success' => false, 'error' => dgettext("plugin_contactimporter", "File could not be moved to TMP path! Check plugin config and folder permissions!")));
+        Helper::respondJSON(array('success' => false, 'error' => dgettext("plugin_contactimporter", "File could not be moved to TMP path! Check plugin config and folder permissions!")));
     }
 } else {
-    respondJSON(array('success' => false, 'error' => dgettext("plugin_contactimporter", "File could not be read by server, upload error!")));
+    Helper::respondJSON(array('success' => false, 'error' => dgettext("plugin_contactimporter", "File could not be read by server, upload error!")));
 }

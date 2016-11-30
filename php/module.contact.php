@@ -21,10 +21,13 @@
  *
  */
 
-include_once('vendor/autoload.php');
+include_once(__DIR__ . "/vendor/autoload.php");
+require_once(__DIR__ . "/helper.php");
 
 use JeroenDesloovere\VCard\VCard;
 use JeroenDesloovere\VCard\VCardParser;
+
+use contactimporter\Helper;
 
 class ContactModule extends Module
 {
@@ -91,28 +94,6 @@ class ContactModule extends Module
         }
 
         return $result;
-    }
-
-    /**
-     * Generates a random string with variable length.
-     * @param $length the lenght of the generated string
-     * @return string a random string
-     */
-    private function randomstring($length = 6)
-    {
-        // $chars - all allowed charakters
-        $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-
-        srand((double)microtime() * 1000000);
-        $i = 0;
-        $pass = "";
-        while ($i < $length) {
-            $num = rand() % strlen($chars);
-            $tmp = substr($chars, $num, 1);
-            $pass = $pass . $tmp;
-            $i++;
-        }
-        return $pass;
     }
 
     /**
@@ -295,7 +276,7 @@ class ContactModule extends Module
         $error_msg = "";
 
         // write csv
-        $token = $this->randomstring(16);
+        $token = Helper::randomstring(16);
         $file = PLUGIN_CONTACTIMPORTER_TMP_UPLOAD . "vcf_" . $token . ".vcf";
         file_put_contents($file, "");
 
@@ -427,7 +408,7 @@ class ContactModule extends Module
 
                     if ($attachnum >= 0) {
                         $attachment = $this->getAttachmentByAttachNum($message, $attachnum); // get first attachment only
-                        $phototoken = $this->randomstring(16);
+                        $phototoken = Helper::randomstring(16);
                         $tmpphoto = PLUGIN_CONTACTIMPORTER_TMP_UPLOAD . "photo_" . $phototoken . ".jpg";
                         $this->storeSavedAttachment($tmpphoto, $attachment);
                         $vcard->addPhoto($tmpphoto, true);
@@ -936,7 +917,7 @@ class ContactModule extends Module
                     if (!is_writable(TMP_PATH . "/")) {
                         error_log("Can not write to export tmp directory!");
                     } else {
-                        $tmppath = TMP_PATH . "/" . $this->randomstring(15);
+                        $tmppath = TMP_PATH . "/" . Helper::randomstring(15);
                         if (isset($vCard->rawPhoto)) {
                             if (file_put_contents($tmppath, $vCard->rawPhoto)) {
                                 $properties["internal_fields"]["x_photo_path"] = $tmppath;
