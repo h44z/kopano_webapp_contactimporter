@@ -23,7 +23,7 @@
 					<serverfile type="module" module="contactmodule">php/module.contact.php</serverfile>
 				</server>
 				<client>
-					<clientfile load="release">js/contactimporter-debug.js</clientfile>
+					<clientfile load="release">js/contactimporter.js</clientfile>
 					<clientfile load="debug">js/contactimporter-debug.js</clientfile>
 
 					<clientfile load="source">js/plugin.contactimporter.js</clientfile>
