@@ -397,9 +397,10 @@ class ContactModule extends Module
                     $vCard->addNote($notes);
                 }
 
-                if (!empty($this->getProp($messageProps, "categories"))) {
-                    $categories = array_map('trim', explode(';', trim($this->getProp($messageProps, "categories"), " ;")));
-                    $vCard->addCategories($categories);
+                $categories = $this->getProp($messageProps, "categories");
+                if (!empty($categories)) {
+                    $categoryArray = array_map('trim', explode(';', trim($categories, " ;")));
+                    $vCard->addCategories($categoryArray);
                 }
 
                 $hasPicture = $this->getProp($messageProps, "has_picture");
