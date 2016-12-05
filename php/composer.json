@@ -1,5 +1,11 @@
 {
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/h44z/vcard"
+        }
+    ],
     "require": {
-        "jeroendesloovere/vcard": "1.2.*"
+        "jeroendesloovere/vcard": "dev-patchcategories"
     }
 }

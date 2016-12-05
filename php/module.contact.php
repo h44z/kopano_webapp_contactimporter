@@ -397,6 +397,11 @@ class ContactModule extends Module
                     $vCard->addNote($notes);
                 }
 
+                if (!empty($this->getProp($messageProps, "categories"))) {
+                    $categories = array_map('trim', explode(';', trim($this->getProp($messageProps, "categories"), " ;")));
+                    $vCard->addCategories($categories);
+                }
+
                 $hasPicture = $this->getProp($messageProps, "has_picture");
                 if (!empty($hasPicture) && $hasPicture === true) {
                     $attachNum = -1;
@@ -920,6 +925,14 @@ class ContactModule extends Module
                 }
                 if (isset($vCard->note)) {
                     $properties["notes"] = $vCard->note;
+                }
+                if (isset($vCard->categories) && count($vCard->categories) > 0) {
+                    $categories = array();
+                    foreach ($vCard->categories as $category) {
+                        $categories[] = $category;
+                    }
+
+                    $properties["categories"] = $categories;
                 }
                 if (isset($vCard->rawPhoto) || isset($vCard->photo)) {
                     if (!is_writable(TMP_PATH . "/")) {
