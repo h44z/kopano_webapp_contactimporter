@@ -875,6 +875,9 @@ class ContactModule extends Module
                 if (isset($vCard->department)) {
                     $properties["department_name"] = $vCard->department;
                 }
+                if (isset($vCard->officelocation)) {
+                    $properties["office_location"] = $vCard->officelocation;
+                }
                 if (isset($vCard->title)) {
                     $properties["title"] = $vCard->title;
                 }
