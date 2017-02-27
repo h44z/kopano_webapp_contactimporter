@@ -934,13 +934,13 @@ class ContactModule extends Module
                     $properties["notes"] = $vCard->note;
                 }
                 if (isset($vCard->x["msassistant"])) {
-                    $properties["assistant"] = $vCard->x["msassistant"];
+                    $properties["assistant"] = $this->unescapeVCFValue($vCard->x["msassistant"]);
                 }
                 if (isset($vCard->x["msmanager"])) {
-                    $properties["manager_name"] = $vCard->x["msmanager"];
+                    $properties["manager_name"] = $this->unescapeVCFValue($vCard->x["msmanager"]);
                 }
                 if (isset($vCard->x["msspouse"])) {
-                    $properties["spouse_name"] = $vCard->x["msspouse"];
+                    $properties["spouse_name"] = $this->unescapeVCFValue($vCard->x["msspouse"]);
                 }
                 if (isset($vCard->categories) && count($vCard->categories) > 0) {
                     $categories = array();
@@ -1181,5 +1181,24 @@ class ContactModule extends Module
     {
         $haystack = str_replace("type=", "", $haystack); // remove type from string
         return substr($haystack, 0, strlen($needle)) === $needle;
+    }
+
+    /**
+     * Unescape newline characters according to rfc6350 section 3.4.
+     * This function will replace:
+     *  - escaped line breaks with PHP_EOL
+     *  - escaped commas by ascii comma
+     *  - escaped semicolon by ascii semicolon
+     *
+     * @link https://tools.ietf.org/html/rfc6350#section-3.4
+     * @param  string $text
+     * @return string
+     */
+    private function unescapeVCFValue($text)
+    {
+        $unescaped = str_replace("\\n", PHP_EOL, $text);
+        $unescaped = str_replace("\\;", ";", $unescaped);
+        $unescaped = str_replace("\\,", ",", $unescaped);
+        return $unescaped;
     }
 }
