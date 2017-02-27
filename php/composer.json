@@ -6,6 +6,6 @@
         }
     ],
     "require": {
-        "jeroendesloovere/vcard": "dev-patchcategories"
+        "jeroendesloovere/vcard": "dev-master"
     }
 }

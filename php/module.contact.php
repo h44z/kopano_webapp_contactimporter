@@ -872,6 +872,9 @@ class ContactModule extends Module
                         $properties["fileas"] = $vCard->organization;
                     }
                 }
+                if (isset($vCard->department)) {
+                    $properties["department_name"] = $vCard->department;
+                }
                 if (isset($vCard->title)) {
                     $properties["title"] = $vCard->title;
                 }
@@ -926,6 +929,15 @@ class ContactModule extends Module
                 }
                 if (isset($vCard->note)) {
                     $properties["notes"] = $vCard->note;
+                }
+                if (isset($vCard->x["msassistant"])) {
+                    $properties["assistant"] = $vCard->x["msassistant"];
+                }
+                if (isset($vCard->x["msmanager"])) {
+                    $properties["manager_name"] = $vCard->x["msmanager"];
+                }
+                if (isset($vCard->x["msspouse"])) {
+                    $properties["spouse_name"] = $vCard->x["msspouse"];
                 }
                 if (isset($vCard->categories) && count($vCard->categories) > 0) {
                     $categories = array();
