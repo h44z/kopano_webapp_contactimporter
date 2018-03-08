@@ -1,4 +1,4 @@
-v2.0.4: 08.02.2018
+v2.0.4: 08.03.2018
  - Small bugfixes
  - Updated documentation
  
