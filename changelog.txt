@@ -1,3 +1,7 @@
+v2.0.4: 08.02.2018
+ - Small bugfixes
+ - Updated documentation
+ 
 v2.0.2: 29.11.2016
  - finally compatible with Kopano Webapp 3.1
  - translation to german added

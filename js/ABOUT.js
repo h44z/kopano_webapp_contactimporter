@@ -2,7 +2,7 @@
  * ABOUT.js, Kopano Webapp contact to vcf im/exporter
  *
  * Author: Christoph Haas <christoph.h@sprinternet.at>
- * Copyright (C) 2012-2016 Christoph Haas
+ * Copyright (C) 2012-2018 Christoph Haas
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -29,7 +29,7 @@ Ext.namespace('Zarafa.plugins.contactimporter');
  * The copyright string holding the copyright notice for the Zarafa contactimporter Plugin.
  */
 Zarafa.plugins.contactimporter.ABOUT = ""
-    + "<p>Copyright (C) 2012-2016  Christoph Haas &lt;christoph.h@sprinternet.at&gt;</p>"
+    + "<p>Copyright (C) 2012-2018  Christoph Haas &lt;christoph.h@sprinternet.at&gt;</p>"
 
     + "<p>This program is free software; you can redistribute it and/or "
     + "modify it under the terms of the GNU Lesser General Public "

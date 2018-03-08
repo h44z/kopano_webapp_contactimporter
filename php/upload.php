@@ -4,7 +4,7 @@
  * upload.php, Kopano Webapp contact to vcf im/exporter
  *
  * Author: Christoph Haas <christoph.h@sprinternet.at>
- * Copyright (C) 2012-2016 Christoph Haas
+ * Copyright (C) 2012-2018 Christoph Haas
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -30,7 +30,7 @@ require_once(__DIR__ . "/../../../server/includes/core/class.webappauthenticatio
 
 use contactimporter\Helper;
 
-/* disable error printing - otherwise json communication might break... */
+// disable error printing - otherwise json communication might break...
 ini_set('display_errors', '0');
 
 // check session
