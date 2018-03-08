@@ -156,7 +156,6 @@ class ContactModule extends Module
                 $importAll = true;
             }
 
-            $propValuesMAPI = array();
             $properties = $this->getProperties();
             $properties = $this->replaceStringPropertyTags($store, $properties);
             $count = 0;
@@ -164,6 +163,8 @@ class ContactModule extends Module
             // iterate through all contacts and import them :)
             foreach ($contacts as $contact) {
                 if (isset($contact["display_name"]) && ($importAll || in_array($contact["internal_fields"]["contact_uid"], $uids))) {
+                    $propValuesMAPI = array();
+                    
                     // parse the arraykeys
                     // TODO: this is very slow...
                     foreach ($contact as $key => $value) {
