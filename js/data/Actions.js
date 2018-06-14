@@ -125,7 +125,7 @@ Zarafa.plugins.contactimporter.data.Actions = {
         var inbox = container.getHierarchyStore().getDefaultStore();
         var pub = container.getHierarchyStore().getPublicStore();
 
-        if (!Ext.isEmpty(inbox.subStores) && inbox.subStores.folders.totalLength > 0) {
+        if (!Ext.isEmpty(inbox) && !Ext.isEmpty(inbox.subStores)) {
             for (var i = 0; i < inbox.subStores.folders.totalLength; i++) {
                 var folder = inbox.subStores.folders.getAt(i);
                 if (!Ext.isEmpty(folder) && folder.get("container_class") == "IPF.Contact") {
@@ -146,7 +146,7 @@ Zarafa.plugins.contactimporter.data.Actions = {
             }
         }
 
-        if (!Ext.isEmpty(pub.subStores) && pub.subStores.folders.totalLength > 0) {
+        if (!Ext.isEmpty(pub) && !Ext.isEmpty(pub.subStores)) {
             for (var j = 0; j < pub.subStores.folders.totalLength; j++) {
                 var folder = pub.subStores.folders.getAt(j);
                 if (!Ext.isEmpty(folder) && folder.get("container_class") == "IPF.Contact") {
