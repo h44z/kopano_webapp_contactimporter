@@ -1,3 +1,7 @@
+v2.0.5: 14.06.2018
+ - Fixed JS error, thanks to hartois
+ - Fixed manifest.xml structure (validation now succeeds)
+
 v2.0.4: 08.03.2018
  - Small bugfixes
  - Updated documentation
