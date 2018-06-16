@@ -1,0 +1,189 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Plugin Contactimporter\n"
+"POT-Creation-Date: 2016-11-29 18:34+0100\n"
+"PO-Revision-Date: 2016-11-29 18:34+0100\n"
+"Last-Translator: \n"
+"Language-Team: Christoph Haas <christoph.h@sprinternet.at>\n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.7.1\n"
+"X-Poedit-Basepath: ../../..\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-SearchPath-0: php\n"
+"X-Poedit-SearchPath-1: js\n"
+
+#: js/dialogs/ImportContentPanel.js:45
+msgid "Import Contacts"
+msgstr "Импортировать Контакты"
+
+#: js/dialogs/ImportPanel.js:98
+msgid "Loading..."
+msgstr "Загрузка..."
+
+#: js/dialogs/ImportPanel.js:290
+msgid "Select contacts to import"
+msgstr "Выберите контакты для импорта"
+
+#: js/dialogs/ImportPanel.js:301
+msgid "Displayname"
+msgstr "Отображаемое имя"
+
+#: js/dialogs/ImportPanel.js:302
+msgid "Firstname"
+msgstr "Имя"
+
+#: js/dialogs/ImportPanel.js:303
+msgid "Lastname"
+msgstr "Фамилия"
+
+#: js/dialogs/ImportPanel.js:304
+msgid "Company"
+msgstr "Компания"
+
+#: js/dialogs/ImportPanel.js:325
+msgid "Select folder"
+msgstr "Выбор каталога"
+
+#: js/dialogs/ImportPanel.js:348
+msgid "Select an .vcf addressbook"
+msgstr "Выбор .vcf адресной книги"
+
+#: js/dialogs/ImportPanel.js:372
+msgid "Import"
+msgstr "Импорт"
+
+#: js/dialogs/ImportPanel.js:391
+msgid "Import All"
+msgstr "Импорт всех"
+
+#: js/dialogs/ImportPanel.js:408
+msgid "Cancel"
+msgstr "Отмена"
+
+#: js/dialogs/ImportPanel.js:426
+msgid "Uploading and parsing contacts..."
+msgstr "Загрузка и парсинг контактов..."
+
+#: js/dialogs/ImportPanel.js:432 js/dialogs/ImportPanel.js:531
+#: js/dialogs/ImportPanel.js:539 js/dialogs/ImportPanel.js:586
+#: js/plugin.contactimporter.js:169
+msgid "Error"
+msgstr "Ошибка"
+
+#: js/dialogs/ImportPanel.js:487
+msgid "Parser Error"
+msgstr "Ошибка парсинга"
+
+#: js/dialogs/ImportPanel.js:532
+msgid "You have to choose an addressbook!"
+msgstr "Нужно выбрать адресную книгу!"
+
+#: js/dialogs/ImportPanel.js:540
+msgid "You have to choose at least one contact to import!"
+msgstr "Нужно выбрать хотя бы один контакт для импорта!"
+
+#. TRANSLATORS: {0} will be replaced by the number of contacts that were imported
+#: js/dialogs/ImportPanel.js:583
+msgid "Imported"
+msgstr "Импортировано"
+
+#: js/dialogs/ImportPanel.js:583
+msgid "Imported {0} contacts. Please reload your addressbook!"
+msgstr "Импортировано {0} контактов. Пожалуйста перезагрузите адресную книгу!"
+
+#. TRANSLATORS: {0} will be replaced by the error message
+#: js/dialogs/ImportPanel.js:588
+msgid "Import failed: {0}"
+msgstr "Ошибки импорта: {0}"
+
+#: js/plugin.contactimporter.js:64 js/ui/ContextMenu.js:78
+msgid "Export vCard"
+msgstr "Экспорт vCard"
+
+#. TRANSLATORS: {0} will be replaced by the number of contacts that will be exported
+#. TRANSLATORS: {0} will be replaced by the number of contacts that will be exported
+#: js/plugin.contactimporter.js:93 js/ui/ContextMenu.js:104
+msgid "Contact Export"
+msgstr "Экспорт Контактов"
+
+#: js/plugin.contactimporter.js:93 js/ui/ContextMenu.js:104
+msgid "Exporting {0} contacts. Please wait..."
+msgstr "Экспортировано {0} контактов. Пожалуйста подождите..."
+
+#: js/plugin.contactimporter.js:115 js/ui/ContextMenu.js:139
+msgid "Warning"
+msgstr "Внимание"
+
+#: js/plugin.contactimporter.js:144
+msgid "Import to Contacts"
+msgstr "Импорт в Контакты"
+
+#: js/plugin.contactimporter.js:183
+msgid "Please wait"
+msgstr "Пожалуйста подождите"
+
+#: js/plugin.contactimporter.js:184
+msgid "Loading attachment..."
+msgstr "Загрузка вложения..."
+
+#: js/plugin.contactimporter.js:185
+msgid "Initializing..."
+msgstr "Инициализация..."
+
+#. TRANSLATORS: {0} will be replaced by the percentage value (0-100)
+#: js/plugin.contactimporter.js:198
+msgid "{0}% loaded"
+msgstr "{0}% загружено"
+
+#: js/plugin.contactimporter.js:310
+msgid "Contactimporter Plugin"
+msgstr "Contactimporter Plugin"
+
+#: js/ui/ContextMenu.js:66
+msgid "Import vCard"
+msgstr "Импорт vCard"
+
+#: php/module.contact.php:245
+msgid "VCF file is empty!"
+msgstr "VCF файл пустой!"
+
+#. TRANSLATORS: Filename suffix for exported files
+#: php/module.contact.php:448
+msgid "_contacts.vcf"
+msgstr "_contacts.vcf"
+
+#: php/module.contact.php:451
+msgid "No contacts found. Export skipped!"
+msgstr "Контакты не найдены. Экспорт пропущен!"
+
+#: php/module.contact.php:728
+msgid "No contacts in vcf file"
+msgstr "Нет контактов в vcf файле"
+
+#: php/module.contact.php:739
+msgid "File could not be read by server"
+msgstr "Файл не может быть прочитан сервером"
+
+#: php/module.contact.php:1141
+msgid "Store could not be opened!"
+msgstr "Невозможно открыть хранилище!"
+
+#: php/module.contact.php:1147
+msgid "Wrong call, store and entryid have to be set!"
+msgstr "Неправильный вызов, store и entryid должны быть установлены!"
+
+#: php/upload.php:69
+msgid ""
+"File could not be moved to TMP path! Check plugin config and folder "
+"permissions!"
+msgstr ""
+"Файл не может быть перемещён в TMP путь! Проверьте конфигурацию плагина"
+"права на каталог!"
+
+#: php/upload.php:72
+msgid "File could not be read by server, upload error!"
+msgstr "Файл не может быть прочитан сервером, ошибка загрузки!"
